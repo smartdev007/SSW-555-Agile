@@ -10,4 +10,4 @@ branches:
   
 # command to run tests
 script:
- - python -m unittest test_sprint
+ - python -m unittest Project02_Jenish_Kevadia
