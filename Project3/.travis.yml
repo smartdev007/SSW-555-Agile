@@ -4,9 +4,9 @@ python:
  
 branches:
   only:
-    - Project3
+    - gh-pages
+    - /.*/
     
-# before_install: cd Project3  
   
 # command to run tests
 script:
