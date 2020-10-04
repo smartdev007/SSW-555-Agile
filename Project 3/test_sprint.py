@@ -106,7 +106,96 @@ def test_birth_after_marraige_appended_to_error():
     assert sprint1.anomaly_array[0] == "ERROR: INDIVIDUAL: US02: @I1@: Person has marriage date 1968-6-4 before birth date 1970-11-8"
     return True
 
+def test_legal_marriage(age):
+    family_dic = {
+        '@F1@': {'FAM': '@F1@',
+                'HUSB_NAME': 'Ned /Stark/',
+                'HUSB': '@I8@',
+                'WIFE_NAME': 'Kate /Stark/',
+                'WIFE': '@I3@',
+                'FAM_CHILD': ['@I9@'],
+                'CHIL': '@I9@',
+                'MARR': '2000-3-24',
+                'DIV': 'NA',
+                'husband_object': {'INDI': '@I8@',
+                                    'NAME': 'Ned /Stark/',
+                                    'SEX': 'M',
+                                    'BIRT': f'{age}-3-17',
+                                    'INDI_CHILD': 'NA',
+                                    'SPOUSE': ['@F1@'],
+                                    'DEAT': 'NA',
+                                    'ALIVE': True},
+                'wife_object': {'INDI': '@I3@',
+                                'NAME': 'Kate /Stark/',
+                                'SEX': 'F',
+                                'BIRT': '1980-7-10',
+                                'INDI_CHILD': ['@F5@'],
+                                'SPOUSE': ['@F1@'],
+                                'DEAT': 'NA',
+                                'ALIVE': True}
+            }
+    }
+    
+    userStory_07_10.family_dic = family_dic
+    userStory_07_10.anomaly_array = []
+    userStory_07_10.is_marriage_legal()
 
+    return len(userStory_07_10.anomaly_array) == 0
+
+def test_over_age_150():
+    individuals={
+        '@I1@': {'INDI': '@I1@',
+                'NAME': 'Jimmy /Colon/',
+                'SEX': 'M',
+                'BIRT': '1860-6-5',
+                'INDI_CHILD': ['@F2@'],
+                'SPOUSE': ['@F1@'],
+                'DEAT': 'NA',
+                'AGE': '190',
+                'ALIVE': True},
+        '@I2@': {'INDI': '@I2@',
+                'NAME': 'Helen /Colon/',
+                'SEX': 'F',
+                'BIRT': '1850-12-10',
+                'DEAT': '2009-6-2',
+                'INDI_CHILD': 'NA',
+                'SPOUSE': ['@F1@'],
+                'AGE': '159',
+                'ALIVE': False}}
+                    
+    userStory_07_10.individuals = individuals
+    userStory_07_10.anomaly_array = []
+    userStory_07_10.is_age_legal()
+    
+    return userStory_07_10.anomaly_array==['ANOMALY: INDIVIDUAL: US07: @I1@: More than 150 years old - Birth Date 1860-6-5',
+    'ANOMALY: INDIVIDUAL: US07: @I2@: More than 150 years old at death - Birth Date 1850-12-10: Death Date 2009-6-2']
+
+def test_less_age_150():
+    individuals={
+        '@I1@': {'INDI': '@I1@',
+                'NAME': 'Jimmy /Colon/',
+                'SEX': 'M',
+                'BIRT': '1960-6-5',
+                'INDI_CHILD': ['@F2@'],
+                'SPOUSE': ['@F1@'],
+                'DEAT': 'NA',
+                'AGE': '49',
+                'ALIVE': True},
+        '@I2@': {'INDI': '@I2@',
+                'NAME': 'Helen /Colon/',
+                'SEX': 'F',
+                'BIRT': '1950-12-10',
+                'DEAT': '2009-6-2',
+                'INDI_CHILD': 'NA',
+                'SPOUSE': ['@F1@'],
+                'AGE': '59',
+                'ALIVE': False}}
+                    
+    userStory_07_10.individuals = individuals
+    userStory_07_10.anomaly_array = []
+    userStory_07_10.is_age_legal()
+    
+    return len(userStory_07_10.anomaly_array) == 0
 
 
 class TestUserStory(unittest.TestCase):
@@ -128,6 +217,30 @@ class TestUserStory(unittest.TestCase):
         self.assertTrue(test_birth_after_marraige_appended_to_error())
     def test_Birth_Before_Marraige_Do_Nothing(self):
         self.assertTrue(test_birth_before_marraige_do_nothing())
+        
+    def test_Marriqge_Ater_14_pass(self):
+        """ Test case for user story 10 to check for legal marriage (pass) """
+        self.assertTrue(test_legal_marriage(1972))
+        self.assertTrue(test_legal_marriage(1974))
+        self.assertTrue(test_legal_marriage(1971))
+        self.assertTrue(test_legal_marriage(1980))
+        self.assertTrue(test_legal_marriage(1981))
+
+    def test_Marriqge_Ater_14_fail(self):
+        """ Test case for user story 10 to check for legal marriage (fail) """
+        self.assertFalse(test_legal_marriage(2004))
+        self.assertFalse(test_legal_marriage(2005))
+        self.assertFalse(test_legal_marriage(2006))
+        self.assertFalse(test_legal_marriage(2007))
+        self.assertFalse(test_legal_marriage(2008))
+
+    def test_Less_Then_150_Years_Old_fail(self):
+        """ Test case for user story 7 to check if age is within 150 years (fail) """
+        self.assertTrue(test_over_age_150())
+        
+    def test_Less_Then_150_Years_Old_pass(self):
+        """ Test case for user story 7 to check if age is within 150 years (pass) """
+        self.assertTrue(test_less_age_150())
 
 
 if __name__ == '__main__':
