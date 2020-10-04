@@ -6,6 +6,9 @@ branches:
   only:
     - Project3
     - master
+    
+before_install: cd Project3  
+  
 # command to run tests
 script:
  - python -m unittest test_sprint
