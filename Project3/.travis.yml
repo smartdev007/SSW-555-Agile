@@ -7,7 +7,7 @@ branches:
     - Project3
     - master
     
-before_install: cd Project 3  
+before_install: cd Project3  
   
 # command to run tests
 script:
