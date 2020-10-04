@@ -2,10 +2,15 @@ language: python
 python:
  - "3.7"
  
+#Blacklist master branch
+branches:
+  except:
+    - master
+
+#Run Project3 branch
 branches:
   only:
-    - gh-pages
-    - /.*/
+    - Project3
     
   
 # command to run tests
