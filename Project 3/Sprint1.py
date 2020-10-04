@@ -159,6 +159,38 @@ def is_birth_before_marraige():
             if is_date_after(marriage_date, wife_birth_date):
                  anomaly_array.append(("ERROR: INDIVIDUAL: US02: {}: Person has marriage date {} before birth date {}").format(family["wife_object"]["INDI"], marriage_date, wife_birth_date))
 
+def is_marriage_legal():
+    """ US10 Marriage after 14 """
+    for family_id in family_dic:
+        if "MARR" in family_dic[family_id] and family_dic[family_id]["MARR"]!="NA":
+            married_date = family_dic[family_id]["MARR"]
+
+        if "husband_object" in family_dic[family_id]:
+            husband = family_dic[family_id]["husband_object"]
+
+            if int(determine_age(husband["BIRT"], married_date)) < 14:
+                anomaly_array.append(f"ANOMALY: INDIVIDUAL: US10: {husband['INDI']}: Father of family {family_id} is younger than 14 years old - Birth Date {husband['BIRT']}")
+
+        if "wife_object" in family_dic[family_id]:
+            wife = family_dic[family_id]["wife_object"]
+
+            if int(determine_age(wife["BIRT"], married_date)) < 14:
+                anomaly_array.append(f"ANOMALY: INDIVIDUAL: US10: {wife['INDI']}: Wife of family {family_id} is younger than 14 years old - Birth Date {wife['BIRT']}")
+
+def is_age_legal():
+    """ US07 Less than 150 years old """ 
+    for indi_id in individuals:
+        indi = individuals[indi_id]
+
+        if "AGE" in indi:
+            age = indi["AGE"]
+
+            if int(age) > 150:
+                if indi["ALIVE"]:
+                    anomaly_array.append(f"ANOMALY: INDIVIDUAL: US07: {indi_id}: More than 150 years old - Birth Date {indi['BIRT']}")
+                else:
+                    anomaly_array.append(f"ANOMALY: INDIVIDUAL: US07: {indi_id}: More than 150 years old at death - Birth Date {indi['BIRT']}: Death Date {indi['DEAT']}")
+
 
 def find_name(arr, _id):
     for indi in arr:
