@@ -158,7 +158,41 @@ def is_birth_before_marraige():
                 anomaly_array.append(("ERROR: INDIVIDUAL: US02: {}: Person has marriage date {} before birth date {}").format(family["husband_object"]["INDI"], marriage_date, husband_birth_date))
             if is_date_after(marriage_date, wife_birth_date):
                  anomaly_array.append(("ERROR: INDIVIDUAL: US02: {}: Person has marriage date {} before birth date {}").format(family["wife_object"]["INDI"], marriage_date, wife_birth_date))
+#User_Story_29: List all deceased individuals in a GEDCOM file
+#Prints out a table with all the deceased people's information
+def listDeceased():
+    current_dic = {}
+    print("User_Story_29: List all deceased individuals in a GEDCOM file")
+    for value in individuals.values():
+        if(str(value["DEAT"]) != "NA" and (value["ALIVE"])):
+            anomaly_array.append(("ERROR: INDIVIDUAL: US29: {}: Person is alive but has Death Date {}").format(value["NAME"], value["DEAT"]))
+            print(("ERROR: INDIVIDUAL: US29: Person {} is alive but has Death Date {}").format(value["NAME"], value["DEAT"]))
+        elif(str(value["DEAT"]) == "NA" and (not value["ALIVE"])):
+            anomaly_array.append(("ERROR: INDIVIDUAL: US29: {}: Person is dead but has no Death Date").format(value["DEAT"]))
+            print(("ERROR: INDIVIDUAL: US29: {}: Person is dead but has no Death Date").format(value["INDI"]))
+        elif(not value["ALIVE"]):
+            current_dic[value["INDI"]] = value    
+    #Use pretty table module to print out the results
+    allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death"]
+    tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT"]
+    printTable("US29: Deceased People Table", allFields, tagNames, current_dic)
 
+#User_Story_30: List all living married people in a GEDCOM file
+#Prints out a table with all the living married people's information
+def listLivingMarried():
+    current_dic = {}
+    print("User_Story_30: List all living married people in a GEDCOM file")
+    for value in individuals.values():
+        if(value["ALIVE"] and value["SPOUSE"] != "NA"):
+            current_dic[value["INDI"]] = value
+        elif(not value["ALIVE"] and value["SPOUSE"] != "NA"):
+            anomaly_array.append("ERROR: INDIVIDUAL: US30: {}: Deceased Person is married to Person {}".format(value["INDI"], "".join(value["SPOUSE"])))
+            print("ERROR: INDIVIDUAL: US30: {}: Deceased Person is married to Person {}".format(value["INDI"], "".join(value["SPOUSE"])))
+    #Use pretty table module to print out the results
+    allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
+    tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
+    printTable("US30: Living & Married People Table", allFields, tagNames, current_dic)
+                                                 
 
 def find_name(arr, _id):
     for indi in arr:
