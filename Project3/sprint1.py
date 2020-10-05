@@ -75,7 +75,6 @@ def check_last_names():
                     else:
                         if last_name != get_last_name(child["NAME"]):
                             anomaly_array.append(f"ANOMALY: INDIVIDUAL: US16: {child['INDI']}: Individual has different last name {get_last_name(child['NAME'])} than family {last_name}")
-
 def isDateParent(A):
     return A[1] in dict_tag["DATE"]
 
@@ -182,6 +181,7 @@ def unique_family_name_and_birth():
                     anomaly_array.append(f"ANOMALY: INDIVIDUAL: US25: {child['INDI']}: {li[temp]}: Individuals share the same name {child['NAME']} and birth date {child['BIRT']} from family {value['FAM']}")
                 else:          
                     li[temp]=child["INDI"]
+
 
 def find_name(arr, _id):
     for indi in arr:
