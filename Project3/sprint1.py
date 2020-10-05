@@ -44,37 +44,8 @@ def create_family_dic():
 
         family_dic[family["FAM"]] = family
 
-def unique_name_and_birth():
-    li = {}
-    for value in individuals.values():
-        temp = value["NAME"] + value["BIRT"]
-        if temp in li:
-            anomaly_array.append("ANOMALY: INDIVIDUAL: US23: {}: {}: Individuals have the same name {} and birth date {}".format(value["INDI"], li[temp], value["NAME"], value["BIRT"]))
-        else:
-            li[temp]=value["INDI"]
 
-def get_last_name(name):
-    return name.split('/')[1]
 
-def check_last_names():
-    for family_id in family_dic:
-        family = family_dic[family_id]
-        last_name = None
-
-        if "HUSB_NAME" in family:
-            if family["HUSB_NAME"] != "NA":
-                last_name = get_last_name(family["HUSB_NAME"])
-            else:
-                continue
-
-        if "children_objects" in family:
-            for child in family["children_objects"]:
-                if child["SEX"] == "M":
-                    if last_name is None:
-                        last_name = get_last_name(child["NAME"])
-                    else:
-                        if last_name != get_last_name(child["NAME"]):
-                            anomaly_array.append(f"ANOMALY: INDIVIDUAL: US16: {child['INDI']}: Individual has different last name {get_last_name(child['NAME'])} than family {last_name}")
 def isDateParent(A):
     return A[1] in dict_tag["DATE"]
 
