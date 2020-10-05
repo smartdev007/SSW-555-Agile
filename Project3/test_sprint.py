@@ -198,12 +198,12 @@ def test_unique_name_and_birth_pass(year):
                              'AGE': '63',
                              'ALIVE': True}}
 
-    userStory_16_23.individuals = individuals
-    userStory_16_23.anomaly_array = []
+    sprint1.individuals = individuals
+    sprint1.anomaly_array = []
 
-    userStory_16_23.unique_name_and_birth()
+    sprint1.unique_name_and_birth()
 
-    return userStory_16_23.anomaly_array == [
+    return sprint1.anomaly_array == [
         'ANOMALY: INDIVIDUAL: US23: @I35@: @I31@: Individuals have the same name Sock /Malagon/ and birth date 1955-10-17']
 
 
@@ -211,11 +211,11 @@ def test_different_male_last_name():
     family_dic = {'@F1@': {'HUSB_NAME': 'Harry /Potter/', 'FAM_CHILD': ['@I1@', '@I10@'],
                            'children_objects': [{'INDI': '@I1@', 'SEX': 'M', 'NAME': 'Chandler /Bing/'},
                                                 {'INDI': '@I10@', 'SEX': 'M', 'NAME': 'Chandler /Potter/'}]}}
-    userStory_16_23.family_dic = family_dic
-    userStory_16_23.anomaly_array = []
+    sprint1.family_dic = family_dic
+    sprint1.anomaly_array = []
 
-    userStory_16_23.check_last_names()
-    return userStory_16_23.anomaly_array[
+    sprint1.check_last_names()
+    return sprint1.anomaly_array[
                0] == 'ANOMALY: INDIVIDUAL: US16: @I1@: Individual has different last name Bing than family Potter'
 
 
@@ -223,12 +223,12 @@ def test_same_male_last_name():
     family_dic = {'@F1@': {'HUSB_NAME': 'Harry /Potter/', 'FAM_CHILD': ['@I1@', '@I10@'],
                            'children_objects': [{'INDI': '@I1@', 'SEX': 'M', 'NAME': 'Joey /Potter/'},
                                                 {'INDI': '@I10@', 'SEX': 'M', 'NAME': 'Chandler /Potter/'}]}}
-    userStory_16_23.family_dic = family_dic
-    userStory_16_23.anomaly_array = []
+    sprint1.family_dic = family_dic
+    sprint1.anomaly_array = []
 
-    userStory_16_23.check_last_names()
+    sprint1.check_last_names()
 
-    return len(userStory_16_23.anomaly_array) == 0
+    return len(sprint1.anomaly_array) == 0
 
 
 class TestUserStory(unittest.TestCase):
