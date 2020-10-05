@@ -144,6 +144,17 @@ def test_list_living_married_individuals_success(mock_printTable):
     mock_printTable.assert_called_with("US30: Living & Married People Table", allFields, tagNames, current_dic)
     return True
 
+# User_Story_30: List all living married people in a GEDCOM file
+# Failed test
+@mock.patch("Sprint1.printTable")
+def test_list_living_married_individuals_error(mock_printTable):
+    allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
+    tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
+    current_dic = {'@I4@': {'INDI': '@I1@', 'NAME': 'Michael /Chang/', 'SEX': 'M', 'BIRT': '1958-9-6', 'INDI_CHILD': ['@F2@'], 'SPOUSE': ['@F3@'], 'DEAT': '2002-9-6', 'AGE': '61', 'ALIVE': False}}
+    Sprint1.individuals = current_dic
+    Sprint1.listLivingMarried()
+    mock_printTable.assert_called_with("US30: Living & Married People Table", allFields, tagNames, {}) #provide empty dictionary so that it won't overwrite
+    return True
 
 
 def test_less_than_15_siblings(sib_dic):
@@ -338,6 +349,19 @@ class TestUserStory(unittest.TestCase):
         """ Test case to check male last name (same name) """
         self.assertTrue(test_same_male_last_name())
 
+    def test_List_Deceased_success(self):
+        self.assertTrue(test_list_deceased_individuals_success())
+		
+    def test_List_Deceased_fail(self):
+        self.assertTrue(test_list_deceased_individuals_error())
+		
+    def test_List_Living_Married_success(self):
+        self.assertTrue(test_list_living_married_individuals_success())
+		
+    def test_List_Living_Married_fail(self):
+        self.assertTrue(test_list_living_married_individuals_error())
+	
+	
 if __name__ == '__main__':
     """ Run test cases on startup """
     unittest.main(exit=False, verbosity=2)
