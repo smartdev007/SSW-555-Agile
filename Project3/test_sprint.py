@@ -106,6 +106,45 @@ def test_birth_after_marraige_appended_to_error():
     assert sprint1.anomaly_array[0] == "ERROR: INDIVIDUAL: US02: @I1@: Person has marriage date 1968-6-4 before birth date 1970-11-8"
     return True
 
+# User_Story_29: List all deceased individuals in a GEDCOM file
+# Success test 
+@mock.patch("Sprint1.printTable")
+def test_list_deceased_individuals_success(mock_printTable):
+    allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death"]
+    tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT"]
+    current_dic = {'@I6@': {'INDI': '@I6@', 'NAME': 'Stephen /Chang/', 'SEX': 'M', 'BIRT': '1935-12-5', 'DEAT': '2005-4-15', 'INDI_CHILD': 'NA', 'SPOUSE': ['@F2@'], 'AGE': '70', 'ALIVE': False}}
+    Sprint1.individuals = current_dic
+    Sprint1.listDeceased()
+    mock_printTable.assert_called_with("US29: Deceased People Table", allFields, tagNames, current_dic)
+    return True
+
+	
+# User_Story_29: List all deceased individuals in a GEDCOM file
+# Failed test: Person is dead but has no Death Date
+@mock.patch("Sprint1.printTable")
+def test_list_deceased_individuals_error(mock_printTable):
+    allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death"]
+    tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT"]
+    current_dic = {'@I6@': {'INDI': '@I6@', 'NAME': 'David /Chang/', 'SEX': 'M', 'BIRT': '2002-12-5', 'DEAT': 'NA', 'INDI_CHILD': 'NA', 'SPOUSE': ['@F7@'], 'AGE': '79', 'ALIVE': False}}
+    Sprint1.individuals = current_dic
+    Sprint1.listDeceased()
+    mock_printTable.assert_called_with("US29: Deceased People Table", allFields, tagNames, {}) #provide empty dictionary so that it won't overwrite
+    return True
+	
+# User_Story_30: List all living married people in a GEDCOM file
+# Success test
+@mock.patch("Sprint1.printTable")
+def test_list_living_married_individuals_success(mock_printTable):
+
+    allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
+    tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
+    current_dic = {'@I1@': {'INDI': '@I1@', 'NAME': 'Johnny /Chang/', 'SEX': 'M', 'BIRT': '1958-9-6', 'INDI_CHILD': ['@F2@'], 'SPOUSE': ['@F1@'], 'DEAT': 'NA', 'AGE': '61', 'ALIVE': True}}
+    Sprint1.individuals = current_dic
+    Sprint1.listLivingMarried()
+    mock_printTable.assert_called_with("US30: Living & Married People Table", allFields, tagNames, current_dic)
+    return True
+
+
 
 def test_less_than_15_siblings(sib_dic):
     family_dic = sib_dic
@@ -231,6 +270,7 @@ def test_same_male_last_name():
     return len(userStory_16_23.anomaly_array) == 0
 
 
+
 class TestUserStory(unittest.TestCase):
     """ Test case for user story """
 
@@ -250,6 +290,7 @@ class TestUserStory(unittest.TestCase):
         self.assertTrue(test_birth_after_marraige_appended_to_error())
     def test_Birth_Before_Marraige_Do_Nothing(self):
         self.assertTrue(test_birth_before_marraige_do_nothing())
+
     def test_Less_Than_15_Siblings_pass(self):
         d1 = {'@F1@':{'FAM_CHILD':['@I1@']}}
         d2 = {'@F1@':{'FAM_CHILD':['@I1@', '@I2@', '@I3@']}}
@@ -291,6 +332,7 @@ class TestUserStory(unittest.TestCase):
     def test_Different_Male_Last_Name(self):
         """ Test case to check male last name (different name) """
         self.assertTrue(test_different_male_last_name())
+
 
     def test_Same_Male_Last_Name(self):
         """ Test case to check male last name (same name) """
