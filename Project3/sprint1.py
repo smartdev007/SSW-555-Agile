@@ -158,6 +158,8 @@ def is_birth_before_marraige():
             if is_date_after(marriage_date, husband_birth_date):
                 anomaly_array.append(("ERROR: INDIVIDUAL: US02: {}: Person has marriage date {} before birth date {}").format(family["husband_object"]["INDI"], marriage_date, husband_birth_date))
             if is_date_after(marriage_date, wife_birth_date):
+                anomaly_array.append(("ERROR: INDIVIDUAL: US02: {}: Person has marriage date {} before birth date {}")                                    .format(family["wife_object"]["INDI"], marriage_date, wife_birth_date))
+
 
                                                  
 #User_Story_29: List all deceased individuals in a GEDCOM file
@@ -178,6 +180,8 @@ def listDeceased():
     allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death"]
     tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT"]
     printTable("US29: Deceased People Table", allFields, tagNames, current_dic)
+
+
 
 #User_Story_30: List all living married people in a GEDCOM file
 #Prints out a table with all the living married people's information
@@ -221,6 +225,45 @@ def unique_family_name_and_birth():
                 else:          
                     li[temp]=child["INDI"]
 
+
+# Prints out a table of dictionary data with the passed-in arguments
+# Parameters:
+# fields: a list of fields for the table
+# tag_names: tag names used to access each data field
+# dictionary: a dictionary filled with data
+def printTable(table_name, fields, tag_names, dictionary):
+    print(table_name)
+    table = PrettyTable()
+    table.field_names = fields
+    for element in dictionary.values():    
+        count = 1
+        row_data = "" #string uses to store each tag within the current element
+        for name in tag_names:
+            if (count < int(len(tag_names))): #not the last element
+                if (isinstance(element[name], list)): #current element is an array
+                    row_data += (",".join(element[name]) + "? ")
+                else: #current element is not an array
+                    row_data += (str(element[name]) + "? ")
+            elif (count == int(len(tag_names))):
+                if (isinstance(element[name], list)): #current element is an array
+                    row_data += (",".join(element[name]))
+                else: #current element is not an array
+                    row_data += (str(element[name]))
+                break
+            count+= 1
+        table.add_row(row_data.split('?'))
+    # Stores outputs to a text file
+    storeResults(table_name, table.get_string())
+    print(table)
+
+# Stores all Project outputs into a single text file
+# Parameters:
+# result_name: name that will appear 
+def storeResults(result_name, outputs):
+    file = open("ssw555_sprint_outputs.txt", "a")
+    file.write(result_name + "\n")
+    file.write(outputs + "\n\n")
+    file.close()
 
 def find_name(arr, _id):
     for indi in arr:

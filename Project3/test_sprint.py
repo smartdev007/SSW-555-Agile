@@ -1,7 +1,7 @@
 import unittest
 import sprint1
 import mock
-
+from prettytable import PrettyTable
 
 
 def test_dates_pass(date,ddate,bdate,fdate):
@@ -108,7 +108,7 @@ def test_birth_after_marraige_appended_to_error():
 
 # User_Story_29: List all deceased individuals in a GEDCOM file
 # Success test 
-@mock.patch("Sprint1.printTable")
+@mock.patch("sprint1.printTable")
 def test_list_deceased_individuals_success(mock_printTable):
     allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death"]
     tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT"]
@@ -121,7 +121,7 @@ def test_list_deceased_individuals_success(mock_printTable):
 	
 # User_Story_29: List all deceased individuals in a GEDCOM file
 # Failed test: Person is dead but has no Death Date
-@mock.patch("Sprint1.printTable")
+@mock.patch("sprint1.printTable")
 def test_list_deceased_individuals_error(mock_printTable):
     allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death"]
     tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT"]
@@ -133,7 +133,7 @@ def test_list_deceased_individuals_error(mock_printTable):
 	
 # User_Story_30: List all living married people in a GEDCOM file
 # Success test
-@mock.patch("Sprint1.printTable")
+@mock.patch("sprint1.printTable")
 def test_list_living_married_individuals_success(mock_printTable):
 
     allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
@@ -146,7 +146,7 @@ def test_list_living_married_individuals_success(mock_printTable):
 
 # User_Story_30: List all living married people in a GEDCOM file
 # Failed test
-@mock.patch("Sprint1.printTable")
+@mock.patch("sprint1.printTable")
 def test_list_living_married_individuals_error(mock_printTable):
     allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
     tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
