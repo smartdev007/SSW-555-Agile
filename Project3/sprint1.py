@@ -44,6 +44,7 @@ def create_family_dic():
 
         family_dic[family["FAM"]] = family
 
+
 def unique_name_and_birth():
     li = {}
     for value in individuals.values():
@@ -75,7 +76,7 @@ def check_last_names():
                     else:
                         if last_name != get_last_name(child["NAME"]):
                             anomaly_array.append(f"ANOMALY: INDIVIDUAL: US16: {child['INDI']}: Individual has different last name {get_last_name(child['NAME'])} than family {last_name}")
-
+                            
 def isDateParent(A):
     return A[1] in dict_tag["DATE"]
 
@@ -157,41 +158,6 @@ def is_birth_before_marraige():
             if is_date_after(marriage_date, husband_birth_date):
                 anomaly_array.append(("ERROR: INDIVIDUAL: US02: {}: Person has marriage date {} before birth date {}").format(family["husband_object"]["INDI"], marriage_date, husband_birth_date))
             if is_date_after(marriage_date, wife_birth_date):
-                 anomaly_array.append(("ERROR: INDIVIDUAL: US02: {}: Person has marriage date {} before birth date {}").format(family["wife_object"]["INDI"], marriage_date, wife_birth_date))
-#User_Story_29: List all deceased individuals in a GEDCOM file
-#Prints out a table with all the deceased people's information
-def listDeceased():
-    current_dic = {}
-    print("User_Story_29: List all deceased individuals in a GEDCOM file")
-    for value in individuals.values():
-        if(str(value["DEAT"]) != "NA" and (value["ALIVE"])):
-            anomaly_array.append(("ERROR: INDIVIDUAL: US29: {}: Person is alive but has Death Date {}").format(value["NAME"], value["DEAT"]))
-            print(("ERROR: INDIVIDUAL: US29: Person {} is alive but has Death Date {}").format(value["NAME"], value["DEAT"]))
-        elif(str(value["DEAT"]) == "NA" and (not value["ALIVE"])):
-            anomaly_array.append(("ERROR: INDIVIDUAL: US29: {}: Person is dead but has no Death Date").format(value["DEAT"]))
-            print(("ERROR: INDIVIDUAL: US29: {}: Person is dead but has no Death Date").format(value["INDI"]))
-        elif(not value["ALIVE"]):
-            current_dic[value["INDI"]] = value    
-    #Use pretty table module to print out the results
-    allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death"]
-    tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT"]
-    printTable("US29: Deceased People Table", allFields, tagNames, current_dic)
-
-#User_Story_30: List all living married people in a GEDCOM file
-#Prints out a table with all the living married people's information
-def listLivingMarried():
-    current_dic = {}
-    print("User_Story_30: List all living married people in a GEDCOM file")
-    for value in individuals.values():
-        if(value["ALIVE"] and value["SPOUSE"] != "NA"):
-            current_dic[value["INDI"]] = value
-        elif(not value["ALIVE"] and value["SPOUSE"] != "NA"):
-            anomaly_array.append("ERROR: INDIVIDUAL: US30: {}: Deceased Person is married to Person {}".format(value["INDI"], "".join(value["SPOUSE"])))
-            print("ERROR: INDIVIDUAL: US30: {}: Deceased Person is married to Person {}".format(value["INDI"], "".join(value["SPOUSE"])))
-    #Use pretty table module to print out the results
-    allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
-    tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
-    printTable("US30: Living & Married People Table", allFields, tagNames, current_dic)
 
                                                  
 #User_Story_29: List all deceased individuals in a GEDCOM file
@@ -230,6 +196,32 @@ def listLivingMarried():
     printTable("US30: Living & Married People Table", allFields, tagNames, current_dic)
                                                  
                                                  
+
+#USID: 15
+# This function checks sibling count
+def check_sibling_count():
+    for family_id in family_dic:
+        family = family_dic[family_id]
+        if (len(family["FAM_CHILD"]) > 15):
+            anomaly_array.append("ANOMALY: FAMILY: US16: {}: Family has {} siblings which is more than 15 siblings")     
+
+
+#USID: 25
+# This checks the unique
+def unique_family_name_and_birth():
+    for value in family_dic.values():
+        li = {}
+
+        if "children_objects" in value:
+            for child in value["children_objects"]:
+                temp = child["NAME"] + child["BIRT"]
+
+                if temp in li:
+                    anomaly_array.append(f"ANOMALY: INDIVIDUAL: US25: {child['INDI']}: {li[temp]}: Individuals share the same name {child['NAME']} and birth date {child['BIRT']} from family {value['FAM']}")
+                else:          
+                    li[temp]=child["INDI"]
+
+
 def find_name(arr, _id):
     for indi in arr:
         if _id == indi["INDI"]:
