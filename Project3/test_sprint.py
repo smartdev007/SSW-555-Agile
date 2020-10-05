@@ -107,6 +107,76 @@ def test_birth_after_marraige_appended_to_error():
     return True
 
 
+def test_less_than_15_siblings(sib_dic):
+    family_dic = sib_dic
+    sprint1.family_dic = family_dic
+    sprint1.anomaly_array = []
+    
+    sprint1.check_sibling_count()
+
+    return len(sprint1.anomaly_array) == 0
+
+def test_unique_family_name_and_birth_pass():
+    family_dic = {'@F1@': {'FAM': '@F1@',
+                            'HUSB_NAME': 'Samuel /Venzon/',
+                            'HUSB': '@I6@',
+                            'WIFE_NAME': 'Willodean /Malagon/',
+                            'WIFE': '@I1@',
+                            'FAM_CHILD': ['@I7@', '@I13@'],
+                            'CHIL': '@I13@',
+                            'MARR': '1970-7-7',
+                            'DIV': 'NA',
+                            'children_objects': [{'INDI': '@I7@',
+                                'NAME': 'Beth /Venzon/',
+                                'SEX': 'M',
+                                'BIRT': '1973-7-8',
+                                'INDI_CHILD': ['@F1@'],
+                                'SPOUSE': ['@F5@'],
+                                'DEAT': 'NA',
+                                'AGE': '46',
+                                'ALIVE': True},
+                                {'INDI': '@I13@',
+                                    'NAME': 'Beth /Venzon/',
+                                    'SEX': 'F',
+                                    'BIRT': '1973-7-8',
+                                    'INDI_CHILD': ['@F1@'],
+                                    'SPOUSE': 'NA',
+                                    'DEAT': 'NA',
+                                    'AGE': '44',
+                                    'ALIVE': True}]}}
+    
+    sprint1.family_dic = family_dic
+    sprint1.anomaly_array = []
+    sprint1.unique_family_name_and_birth()
+
+    return sprint1.anomaly_array==['ANOMALY: INDIVIDUAL: US25: @I13@: @I7@: Individuals share the same name Beth /Venzon/ and birth date 1973-7-8 from family @F1@']
+
+def test_unique_family_name_and_birth_error():
+    family_dic =  {'children_objects': [{'INDI': '@I30@',
+                                        'NAME': 'Chet /Malagon/',
+                                        'SEX': 'M',
+                                        'BIRT': '1943-8-18',
+                                        'INDI_CHILD': ['@F3@'],
+                                        'SPOUSE': 'NA',
+                                        'DEAT': 'NA',
+                                        'AGE': '76',
+                                        'ALIVE': True},
+                                        {'INDI': '@I31@',
+                                            'NAME': 'Sock /Malagon/',
+                                            'SEX': 'F',
+                                            'BIRT': '1955-10-17',
+                                            'INDI_CHILD': ['@F3@'],
+                                            'SPOUSE': 'NA',
+                                            'DEAT': 'NA',
+                                            'AGE': '63',
+                                            'ALIVE': True}]}
+    
+    sprint1.family_dic = family_dic
+    sprint1.anomaly_array = []
+    sprint1.unique_family_name_and_birth()
+
+    return len(sprint1.anomaly_array) == 0
+
 
 
 class TestUserStory(unittest.TestCase):
@@ -128,6 +198,31 @@ class TestUserStory(unittest.TestCase):
         self.assertTrue(test_birth_after_marraige_appended_to_error())
     def test_Birth_Before_Marraige_Do_Nothing(self):
         self.assertTrue(test_birth_before_marraige_do_nothing())
+    def test_Less_Than_15_Siblings_pass(self):
+        d1 = {'@F1@':{'FAM_CHILD':['@I1@']}}
+        d2 = {'@F1@':{'FAM_CHILD':['@I1@', '@I2@', '@I3@']}}
+        d3 = {'@F1@':{'FAM_CHILD':['@I1@', '@I2@', '@I3@', '@I4@', '@I5@']}}
+        d4 = {'@F1@':{'FAM_CHILD':['@I1@', '@I2@', '@I3@', '@I4@']}}
+        d5 = {'@F1@':{'FAM_CHILD':['@I1@', '@I2@']}}
+
+        self.assertTrue(test_less_than_15_siblings(d1))
+        self.assertTrue(test_less_than_15_siblings(d2))
+        self.assertTrue(test_less_than_15_siblings(d3))
+        self.assertTrue(test_less_than_15_siblings(d4))
+        self.assertTrue(test_less_than_15_siblings(d5))
+
+    def test_Less_Than_15_Siblings_fail(self):
+        d1 = {'@F1@':{'FAM_CHILD':['@I1@', '@I2@', '@I3@', '@I4@', '@I5@', '@I6@', '@I7@', '@I8@', '@I9@', '@I10@', '@I11@', '@I12@', '@I13@', '@I14@', '@I15@', '@I16@']}}
+
+        self.assertFalse(test_less_than_15_siblings(d1))
+    
+    def test_unique_family_name_and_birth_pass(self):
+        """ Test case to check unique family name and birthday (pass) """
+        self.assertTrue(test_unique_family_name_and_birth_pass())
+
+    def test_unique_family_name_and_birth_error(self):
+        """ Test case to check unique family name and birthday (fail) """
+        self.assertTrue(test_unique_family_name_and_birth_error())
 
 
 if __name__ == '__main__':

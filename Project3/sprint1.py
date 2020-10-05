@@ -159,6 +159,29 @@ def is_birth_before_marraige():
             if is_date_after(marriage_date, wife_birth_date):
                  anomaly_array.append(("ERROR: INDIVIDUAL: US02: {}: Person has marriage date {} before birth date {}").format(family["wife_object"]["INDI"], marriage_date, wife_birth_date))
 
+#USID: 15
+# This function checks sibling count
+def check_sibling_count():
+    for family_id in family_dic:
+        family = family_dic[family_id]
+        if (len(family["FAM_CHILD"]) > 15):
+            anomaly_array.append("ANOMALY: FAMILY: US16: {}: Family has {} siblings which is more than 15 siblings")     
+
+
+#USID: 25
+# This checks the unique
+def unique_family_name_and_birth():
+    for value in family_dic.values():
+        li = {}
+
+        if "children_objects" in value:
+            for child in value["children_objects"]:
+                temp = child["NAME"] + child["BIRT"]
+
+                if temp in li:
+                    anomaly_array.append(f"ANOMALY: INDIVIDUAL: US25: {child['INDI']}: {li[temp]}: Individuals share the same name {child['NAME']} and birth date {child['BIRT']} from family {value['FAM']}")
+                else:          
+                    li[temp]=child["INDI"]
 
 def find_name(arr, _id):
     for indi in arr:
