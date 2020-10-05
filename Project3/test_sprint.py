@@ -113,8 +113,8 @@ def test_list_deceased_individuals_success(mock_printTable):
     allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death"]
     tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT"]
     current_dic = {'@I6@': {'INDI': '@I6@', 'NAME': 'Stephen /Chang/', 'SEX': 'M', 'BIRT': '1935-12-5', 'DEAT': '2005-4-15', 'INDI_CHILD': 'NA', 'SPOUSE': ['@F2@'], 'AGE': '70', 'ALIVE': False}}
-    Sprint1.individuals = current_dic
-    Sprint1.listDeceased()
+    sprint1.individuals = current_dic
+    sprint1.listDeceased()
     mock_printTable.assert_called_with("US29: Deceased People Table", allFields, tagNames, current_dic)
     return True
 
@@ -126,8 +126,8 @@ def test_list_deceased_individuals_error(mock_printTable):
     allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death"]
     tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT"]
     current_dic = {'@I6@': {'INDI': '@I6@', 'NAME': 'David /Chang/', 'SEX': 'M', 'BIRT': '2002-12-5', 'DEAT': 'NA', 'INDI_CHILD': 'NA', 'SPOUSE': ['@F7@'], 'AGE': '79', 'ALIVE': False}}
-    Sprint1.individuals = current_dic
-    Sprint1.listDeceased()
+    sprint1.individuals = current_dic
+    sprint1.listDeceased()
     mock_printTable.assert_called_with("US29: Deceased People Table", allFields, tagNames, {}) #provide empty dictionary so that it won't overwrite
     return True
 	
@@ -139,8 +139,8 @@ def test_list_living_married_individuals_success(mock_printTable):
     allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
     tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
     current_dic = {'@I1@': {'INDI': '@I1@', 'NAME': 'Johnny /Chang/', 'SEX': 'M', 'BIRT': '1958-9-6', 'INDI_CHILD': ['@F2@'], 'SPOUSE': ['@F1@'], 'DEAT': 'NA', 'AGE': '61', 'ALIVE': True}}
-    Sprint1.individuals = current_dic
-    Sprint1.listLivingMarried()
+    sprint1.individuals = current_dic
+    sprint1.listLivingMarried()
     mock_printTable.assert_called_with("US30: Living & Married People Table", allFields, tagNames, current_dic)
     return True
 
@@ -151,8 +151,8 @@ def test_list_living_married_individuals_error(mock_printTable):
     allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
     tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
     current_dic = {'@I4@': {'INDI': '@I1@', 'NAME': 'Michael /Chang/', 'SEX': 'M', 'BIRT': '1958-9-6', 'INDI_CHILD': ['@F2@'], 'SPOUSE': ['@F3@'], 'DEAT': '2002-9-6', 'AGE': '61', 'ALIVE': False}}
-    Sprint1.individuals = current_dic
-    Sprint1.listLivingMarried()
+    sprint1.individuals = current_dic
+    sprint1.listLivingMarried()
     mock_printTable.assert_called_with("US30: Living & Married People Table", allFields, tagNames, {}) #provide empty dictionary so that it won't overwrite
     return True
 
