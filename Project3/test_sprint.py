@@ -33,11 +33,11 @@ def test_legal_marriage(age):
             }
     }
     
-    userStory_07_10.family_dic = family_dic
-    userStory_07_10.anomaly_array = []
-    userStory_07_10.is_marriage_legal()
+    sprint1.family_dic = family_dic
+    sprint1.anomaly_array = []
+    sprint1.is_marriage_legal()
 
-    return len(userStory_07_10.anomaly_array) == 0
+    return len(sprint1.anomaly_array) == 0
 
 def test_over_age_150():
     individuals={
@@ -60,11 +60,11 @@ def test_over_age_150():
                 'AGE': '159',
                 'ALIVE': False}}
                     
-    userStory_07_10.individuals = individuals
-    userStory_07_10.anomaly_array = []
-    userStory_07_10.is_age_legal()
+    sprint1.individuals = individuals
+    sprint1.anomaly_array = []
+    sprint1.is_age_legal()
     
-    return userStory_07_10.anomaly_array==['ANOMALY: INDIVIDUAL: US07: @I1@: More than 150 years old - Birth Date 1860-6-5',
+    return sprint1.anomaly_array==['ANOMALY: INDIVIDUAL: US07: @I1@: More than 150 years old - Birth Date 1860-6-5',
     'ANOMALY: INDIVIDUAL: US07: @I2@: More than 150 years old at death - Birth Date 1850-12-10: Death Date 2009-6-2']
 
 def test_less_age_150():
@@ -88,11 +88,11 @@ def test_less_age_150():
                 'AGE': '59',
                 'ALIVE': False}}
                     
-    userStory_07_10.individuals = individuals
-    userStory_07_10.anomaly_array = []
-    userStory_07_10.is_age_legal()
+    sprint1.individuals = individuals
+    sprint1.anomaly_array = []
+    sprint1.is_age_legal()
     
-    return len(userStory_07_10.anomaly_array) == 0
+    return len(sprint1.anomaly_array) == 0
 
 
 def test_dates_pass(date,ddate,bdate,fdate):
@@ -389,14 +389,14 @@ class TestUserStory(unittest.TestCase):
         self.assertTrue(test_dates_pass('2012-06-12','2018-05-11','1965-02-10','1970-04-15'))
       
     def test_Birth_After_Marraige_Appended_To_Error(self):
-	""" Test cases for user story 2 (marriage after 14 fail) """
+        """Test Case for user story 02 to check birth before marriage error"""
         self.assertTrue(test_birth_after_marraige_appended_to_error())
     def test_Birth_Before_Marraige_Do_Nothing(self):
-	""" Test cases for user story 2 (marriage after 14 pass) """
+        """Test Case for user story 2"""
         self.assertTrue(test_birth_before_marraige_do_nothing())
 
     def test_Less_Than_15_Siblings_pass(self):
-	""" Test cases for user story 15 (fewer than 15 siblings pass) """
+        """Test Case for user story 15"""
         d1 = {'@F1@':{'FAM_CHILD':['@I1@']}}
         d2 = {'@F1@':{'FAM_CHILD':['@I1@', '@I2@', '@I3@']}}
         d3 = {'@F1@':{'FAM_CHILD':['@I1@', '@I2@', '@I3@', '@I4@', '@I5@']}}
@@ -410,25 +410,25 @@ class TestUserStory(unittest.TestCase):
         self.assertTrue(test_less_than_15_siblings(d5))
 
     def test_Less_Than_15_Siblings_fail(self):
-	""" Test cases for user story 15 (fewer than 15 siblings fail) """
+        """Test Case for user story 15"""
         d1 = {'@F1@':{'FAM_CHILD':['@I1@', '@I2@', '@I3@', '@I4@', '@I5@', '@I6@', '@I7@', '@I8@', '@I9@', '@I10@', '@I11@', '@I12@', '@I13@', '@I14@', '@I15@', '@I16@']}}
 
         self.assertFalse(test_less_than_15_siblings(d1))
     
     def test_unique_family_name_and_birth_pass(self):
-        """ Test case for user story 25 to check unique family name and birthday (pass) """
+        """Test Case for user story 23"""
         self.assertTrue(test_unique_family_name_and_birth_pass())
 
     def test_unique_family_name_and_birth_error(self):
-        """ Test case for user story 25 to check unique family name and birthday (fail) """
+        """Test Case for user story 23"""
         self.assertTrue(test_unique_family_name_and_birth_error())
 
     def test_unique_name_and_birth_pass(self):
-        """ Test case for user story 23 to check unique name and birth (pass) """
+        """Test Case for user story 23"""
         self.assertTrue(test_unique_name_and_birth_pass(1955))
 
     def test_unique_name_and_birth_fail(self):
-        """ Test case for user story 23 to check unique name and birth (fail) """
+        """Test Case for user story 23"""
         self.assertFalse(test_unique_name_and_birth_pass(1954))
         self.assertFalse(test_unique_name_and_birth_pass(1934))
         self.assertFalse(test_unique_name_and_birth_pass(1924))
@@ -436,32 +436,32 @@ class TestUserStory(unittest.TestCase):
         self.assertFalse(test_unique_name_and_birth_pass(1974))
 
     def test_Different_Male_Last_Name(self):
-        """ Test case for user story 16 to check male last name (different name) """
+        """Test Case for user story 16"""
         self.assertTrue(test_different_male_last_name())
 
 
     def test_Same_Male_Last_Name(self):
-        """ Test case for user story 16 to check male last name (same name) """
+        """Test Case for user story 16"""
         self.assertTrue(test_same_male_last_name())
 
     def test_List_Deceased_success(self):
-	""" Test case for user story 29 to check list deceased (pass) """
+        """Test Case for user story 29"""
         self.assertTrue(test_list_deceased_individuals_success())
 		
     def test_List_Deceased_fail(self):
-	""" Test case for user story 29 to check list deceased (fail) """
+        """Test Case for user story 29"""
         self.assertTrue(test_list_deceased_individuals_error())
 		
     def test_List_Living_Married_success(self):
-	""" Test case for user story 30 to check list living married(pass) """
+        """Test Case for user story 30"""
         self.assertTrue(test_list_living_married_individuals_success())
 		
     def test_List_Living_Married_fail(self):
-	""" Test case for user story 30 to check list living married (fail) """
+        """Test Case for user story 30"""
         self.assertTrue(test_list_living_married_individuals_error())
 	
     def test_Marriqge_Ater_14_pass(self):
-        """ Test case for user story 10 to check for legal marriage (pass) """
+        """Test Case for user story 10"""
         self.assertTrue(test_legal_marriage(1972))
         self.assertTrue(test_legal_marriage(1974))
         self.assertTrue(test_legal_marriage(1971))
@@ -469,7 +469,7 @@ class TestUserStory(unittest.TestCase):
         self.assertTrue(test_legal_marriage(1981))
 
     def test_Marriqge_Ater_14_fail(self):
-        """ Test case for user story 10 to check for legal marriage (fail) """
+        """Test Case for user story 10"""
         self.assertFalse(test_legal_marriage(2004))
         self.assertFalse(test_legal_marriage(2005))
         self.assertFalse(test_legal_marriage(2006))
@@ -477,11 +477,11 @@ class TestUserStory(unittest.TestCase):
         self.assertFalse(test_legal_marriage(2008))
 
     def test_Less_Then_150_Years_Old_fail(self):
-        """ Test case for user story 7 to check if age is within 150 years (fail) """
+        """Test Case for user story 07"""
         self.assertTrue(test_over_age_150())
         
     def test_Less_Then_150_Years_Old_pass(self):
-        """ Test case for user story 7 to check if age is within 150 years (pass) """
+        """Test Case for user story 07"""
         self.assertTrue(test_less_age_150())
 
 
