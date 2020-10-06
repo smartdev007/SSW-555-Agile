@@ -1,0 +1,82 @@
++-----+---------------------+--------+----------------+-----+-------+---------------+-------+--------+
+|  ID |         Name        | Gender |    Birthday    | Age | Alive |     Death     | Child | Spouse |
++-----+---------------------+--------+----------------+-----+-------+---------------+-------+--------+
+|  I1 |   Richard /Stark/   |   M    | 1960 - 6 - 10  |  60 |  True |       NA      |   NA  |   F1   |
+|  I2 |    Lyarra /Flint/   |   F    | 1960 - 5 - 18  |  60 |  True |       NA      |   NA  |   F1   |
+|  I3 |    Eddard /Stark/   |   M    | 1984 - 7 - 22  |  36 |  True |       NA      |   F1  |   F2   |
+|  I4 |   Brandon /Stark/   |   M    | 1986 - 8 - 12  |  34 |  True |       NA      |   F1  |   NA   |
+|  I5 |    Benjen /Stark/   |   M    | 1987 - 5 - 29  |  33 |  True |       NA      |   F1  |   NA   |
+|  I6 |    Lyanna /Stark/   |   F    | 1988 - 11 - 16 |  32 |  True |       NA      |   F1  | F3,F4  |
+|  I7 |   Catelyn /Tully/   |   F    | 1984 - 3 - 14  |  36 |  True |       NA      |   NA  |   F2   |
+|  I8 | Viserys /Targaryen/ |   M    | 1987 - 2 - 14  |  22 | False | 2009 - 1 - 15 |   NA  |   F4   |
+|  I9 | Rhaegar /Targaryen/ |   M    |  1988 - 6 - 8  |  32 |  True |       NA      |   F5  |   F3   |
+| I10 |     Robb /Stark/    |   M    | 2006 - 12 - 7  |  14 |  True |       NA      |   F2  |   NA   |
+| I11 |    Sansa /Stark/    |   F    | 2007 - 2 - 10  |  13 |  True |       NA      |   F2  |   NA   |
+| I12 |     Arya /Stark/    |   F    | 2009 - 6 - 17  |  11 |  True |       NA      |   F2  |   NA   |
+| I13 |     Bran /Stark/    |   M    | 2011 - 7 - 13  |  9  |  True |       NA      |   F2  |   NA   |
+| I14 |    Rickon /Stark/   |   M    | 2013 - 9 - 19  |  7  |  True |       NA      |   F2  |   NA   |
+| I15 |   Jon /Targaryen/   |   M    |  2012 - 6 - 4  |  8  |  True |       NA      |   F3  |   NA   |
+| I16 | Rhaella /Baratheon/ |   F    |  1960 - 8 - 8  |  60 |  True |       NA      |   NA  |   F5   |
+| I17 |  Aerys /Targaryen/  |   M    | 1960 - 4 - 12  |  60 |  True |       NA      |   NA  |   F5   |
+| I18 |  Aegon /Targaryen/  |   M    | 2010 - 6 - 13  |  10 |  True |       NA      |   F4  |   NA   |
++-----+---------------------+--------+----------------+-----+-------+---------------+-------+--------+
++----+---------------+----------+------------+---------------------+---------+---------------------+-------------------------+
+| ID |    Married    | Divorced | Husband ID |     Husband Name    | Wife ID |      Wife Name      |         Children        |
++----+---------------+----------+------------+---------------------+---------+---------------------+-------------------------+
+| F1 |  1982 - 1 - 8 |  ['NA']  |     I1     |   Richard /Stark/   |    I2   |    Lyarra /Flint/   |     {'I3,I4,I5,I6'}     |
+| F2 |  2005 - 8 - 9 |  ['NA']  |     I3     |    Eddard /Stark/   |    I7   |   Catelyn /Tully/   | {'I10,I11,I12,I13,I14'} |
+| F3 |  2010 - 5 - 8 |  ['NA']  |     I9     | Rhaegar /Targaryen/ |    I6   |    Lyanna /Stark/   |         {'I15'}         |
+| F4 | 2008 - 6 - 10 |  ['NA']  |     I8     | Viserys /Targaryen/ |    I6   |    Lyanna /Stark/   |         {'I18'}         |
+| F5 | 1983 - 11 - 8 |  ['NA']  |    I17     |  Aerys /Targaryen/  |   I16   | Rhaella /Baratheon/ |          {'I9'}         |
++----+---------------+----------+------------+---------------------+---------+---------------------+-------------------------+
+test_Birth_After_Marraige_Appended_To_Error (__main__.TestUserStory)
+Test Case for user story 02 to check birth before marriage error ... ok
+test_Birth_Before_Marraige_Do_Nothing (__main__.TestUserStory)
+Test Case for user story 2 ... ok
+test_Dates_After_Today_error (__main__.TestUserStory)
+Test case for user story 1 to check for Date before current date ... ok
+test_Dates_After_Today_pass (__main__.TestUserStory)
+Test case for user story 1 to check for Date before current date ... ok
+test_Different_Male_Last_Name (__main__.TestUserStory)
+Test Case for user story 16 ... ok
+test_Less_Than_15_Siblings_fail (__main__.TestUserStory)
+Test Case for user story 15 ... ok
+test_Less_Than_15_Siblings_pass (__main__.TestUserStory)
+Test Case for user story 15 ... ok
+test_Less_Then_150_Years_Old_fail (__main__.TestUserStory)
+Test Case for user story 07 ... ok
+test_Less_Then_150_Years_Old_pass (__main__.TestUserStory)
+Test Case for user story 07 ... ok
+test_List_Deceased_fail (__main__.TestUserStory)
+Test Case for user story 29 ... User_Story_29: List all deceased individuals in a GEDCOM file
+ERROR: INDIVIDUAL: US29: @I6@: Person is dead but has no Death Date
+ok
+test_List_Deceased_success (__main__.TestUserStory)
+Test Case for user story 29 ... User_Story_29: List all deceased individuals in a GEDCOM file
+ok
+test_List_Living_Married_fail (__main__.TestUserStory)
+Test Case for user story 30 ... User_Story_30: List all living married people in a GEDCOM file
+ERROR: INDIVIDUAL: US30: @I1@: Deceased Person is married to Person @F3@
+ok
+test_List_Living_Married_success (__main__.TestUserStory)
+Test Case for user story 30 ... User_Story_30: List all living married people in a GEDCOM file
+ok
+test_Marriqge_Ater_14_fail (__main__.TestUserStory)
+Test Case for user story 10 ... ok
+test_Marriqge_Ater_14_pass (__main__.TestUserStory)
+Test Case for user story 10 ... ok
+test_Same_Male_Last_Name (__main__.TestUserStory)
+Test Case for user story 16 ... ok
+test_unique_family_name_and_birth_error (__main__.TestUserStory)
+Test Case for user story 23 ... ok
+test_unique_family_name_and_birth_pass (__main__.TestUserStory)
+Test Case for user story 23 ... ok
+test_unique_name_and_birth_fail (__main__.TestUserStory)
+Test Case for user story 23 ... ok
+test_unique_name_and_birth_pass (__main__.TestUserStory)
+Test Case for user story 23 ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.048s
+
+OK
