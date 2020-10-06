@@ -44,13 +44,6 @@ def create_family_dic():
 
         family_dic[family["FAM"]] = family
 
-        def determine_age(birth_date, death_date):
-    if death_date:
-        return int(death_date.split('-')[0]) - int(birth_date.split('-')[0])
-    else:
-        today = datetime.today()
-        return today.year - int(birth_date.split('-')[0])
-
 def is_marriage_legal():
     """ US10 Marriage after 14 """
     for family_id in family_dic:
