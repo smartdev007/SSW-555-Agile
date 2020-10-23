@@ -123,6 +123,8 @@ def birth_before_death():
                         error_array.append(f"ERROR: INDIVIDUAL: US09: {child['INDI']}: Child was born at {child['BIRT']} after 9 month death of father {husband_death}")
 
 
+
+
 def unique_name_and_birth():
     li = {}
     for value in individuals.values():
@@ -239,6 +241,56 @@ def is_birth_before_marraige():
                 anomaly_array.append(("ERROR: INDIVIDUAL: US02: {}: Person has marriage date {} before birth date {}")                                    .format(family["wife_object"]["INDI"], marriage_date, wife_birth_date))
 
 
+#USID: 15
+# This function checks sibling count
+def check_sibling_count():
+    for family_id in family_dic:
+        family = family_dic[family_id]
+        if (len(family["FAM_CHILD"]) > 15):
+            anomaly_array.append("ANOMALY: FAMILY: US16: {}: Family has {} siblings which is more than 15 siblings")  
+
+
+#User_Story_20 Aunts and uncles
+#Aunts and uncles should not marry their nieces or nephews
+def is_uncle_aunt_marriage_legal():
+    for indi in individuals.values(): #scans through each individual first
+        current_sp = indi["SPOUSE"] #Array of spouse's family IDs
+        current_fm = indi["INDI_CHILD"] #gets the family ID that the person belongs to
+        if (current_sp != "NA" and current_fm != "NA"): #if the person has a spouse
+            for fam_id in current_fm: #scans through uncle's families
+                current_family = family_dic[fam_id]
+                current_siblings = current_family["children_objects"] #get the uncle's siblings
+                for child in current_siblings: #scans through all siblings
+                    child_spouses = child["SPOUSE"]
+                    if (child_spouses != "NA"):
+                        for spouse in child_spouses:
+                            spouse_family = family_dic[spouse]
+                            for sp in current_sp:
+                                if (family_dic[sp]["WIFE"] in spouse_family["FAM_CHILD"]):
+                                    current_sp_family = family_dic[sp].values()
+                                    anomaly_array.append("ANOMALY: FAMILY: US20: {}: Person {} should not marry person {}".format(family_dic[sp]["HUSB_LINE"], family_dic[sp]["HUSB"], family_dic[sp]["WIFE"]))
+                                    return False
+                                elif(family_dic[sp]["HUSB"] in spouse_family["FAM_CHILD"]):
+                                    anomaly_array.append("ANOMALY: FAMILY: US20: {}: Person {} should not marry person {}".format(family_dic[sp]["WIFE_LINE"], family_dic[sp]["WIFE"], family_dic[sp]["HUSB"]))
+                                    return False
+    return True
+
+
+#USID: 25
+# This checks the unique
+def unique_family_name_and_birth():
+    for value in family_dic.values():
+        li = {}
+
+        if "children_objects" in value:
+            for child in value["children_objects"]:
+                temp = child["NAME"] + child["BIRT"]
+
+                if temp in li:
+                    anomaly_array.append(f"ANOMALY: INDIVIDUAL: US25: {child['INDI']}: {li[temp]}: Individuals share the same name {child['NAME']} and birth date {child['BIRT']} from family {value['FAM']}")
+                else:          
+                    li[temp]=child["INDI"]
+
                                                  
 #User_Story_29: List all deceased individuals in a GEDCOM file
 #Prints out a table with all the deceased people's information
@@ -260,7 +312,6 @@ def listDeceased():
     printTable("US29: Deceased People Table", allFields, tagNames, current_dic)
 
 
-
 #User_Story_30: List all living married people in a GEDCOM file
 #Prints out a table with all the living married people's information
 def listLivingMarried():
@@ -276,32 +327,23 @@ def listLivingMarried():
     allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
     tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
     printTable("US30: Living & Married People Table", allFields, tagNames, current_dic)
+
                                                  
-                                                 
-
-#USID: 15
-# This function checks sibling count
-def check_sibling_count():
-    for family_id in family_dic:
-        family = family_dic[family_id]
-        if (len(family["FAM_CHILD"]) > 15):
-            anomaly_array.append("ANOMALY: FAMILY: US16: {}: Family has {} siblings which is more than 15 siblings")     
-
-
-#USID: 25
-# This checks the unique
-def unique_family_name_and_birth():
+#US 32: List multiple births
+def multiple_birth():
     for value in family_dic.values():
-        li = {}
-
+        li={}
         if "children_objects" in value:
             for child in value["children_objects"]:
-                temp = child["NAME"] + child["BIRT"]
-
+                temp = str(child["INDI_CHILD"]) + child["BIRT"]
                 if temp in li:
-                    anomaly_array.append(f"ANOMALY: INDIVIDUAL: US25: {child['INDI']}: {li[temp]}: Individuals share the same name {child['NAME']} and birth date {child['BIRT']} from family {value['FAM']}")
+                    anomaly_array.append("ANOMALY: FAMILY: US32: {}: The two or more individuals were born at the same time in a family {}".format(value["FAM_LINE"], value["FAM"]))
                 else:          
-                    li[temp]=child["INDI"]
+                    li[temp]=child["INDI"]                                                 
+   
+
+
+
 
 
 # Prints out a table of dictionary data with the passed-in arguments
