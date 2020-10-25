@@ -250,6 +250,81 @@ def check_sibling_count():
             anomaly_array.append("ANOMALY: FAMILY: US16: {}: Family has {} siblings which is more than 15 siblings")  
 
 
+# USID: 11
+def check_for_bigamy():
+    for individual_id in individuals:
+        individual = individuals[individual_id]
+        if "SPOUSE" in individual and individual["SPOUSE"] != 'NA':
+            spouse_in_families = individual["SPOUSE"]
+            if len(spouse_in_families) > 1:
+                dates = []
+                for family_id in spouse_in_families:
+                    family = family_dic[family_id]
+                    date = {}
+                    if "MARR" in family and family["MARR"] != 'NA':
+                        date["MARR"] = family["MARR"]
+                    if "DIV" in family and family["DIV"] != 'NA':
+                        date["DIV"] = family["DIV"]
+                    elif "husband_object" in family and family["husband_object"] != 'NA':
+                        if "DEAT" in family["husband_object"] and family["husband_object"]["DEAT"] != 'NA':
+                            date["DIV"] = family["husband_object"]["DEAT"]
+                    dates.append(date)
+                if compare_marraige_dates(dates):
+                    anomaly_array.append("ANOMALY: INDIVIDUAL: US11: {}: {}: Performing bigamy".format(individual["INDI_LINE"], individual["INDI"]))
+
+
+def compare_marraige_dates(dates):
+    for i in range(0, len(dates)):
+        dateOne = dates[i]
+        for j in range(i + 1, len(dates)):
+            dateTwo = dates[j]
+            if "MARR" in dateOne and "DIV" in dateOne:
+                if "MARR" in dateTwo:
+                    if dateOne["MARR"] <= dateTwo["MARR"] < dateOne["DIV"]:
+                        return True
+                if "DIV" in dateTwo:
+                    if dateOne["MARR"] < dateTwo["DIV"] < dateOne["DIV"]:
+                        return True
+            elif "MARR" in dateOne:
+                if "MARR" in dateTwo and "DIV" in dateTwo:
+                    if dateTwo["MARR"] <= dateOne["MARR"] < dateTwo["DIV"]:
+                        return True
+                if "MARR" in dateTwo and dateOne["MARR"] <= dateTwo["MARR"]:
+                    return True
+                if "DIV" in dateTwo and dateOne["MARR"] < dateTwo["DIV"]:
+                    return True
+                if "MARR" in dateTwo and "DIV" not in dateTwo and dateTwo["MARR"] <= dateOne["MARR"]:
+                    return True
+            elif "DIV" in dateOne:
+                if "MARR" in dateTwo and "DIV" in dateTwo:
+                    if dateTwo["MARR"] <= dateOne["DIV"] < dateTwo["DIV"]:
+                        return True
+    return False
+
+
+def check_parent_child_marriage():
+    for family_id in family_dic:
+        family = family_dic[family_id]
+        if "HUSB" in family and family["HUSB"] != 'NA' and "WIFE" in family and family["WIFE"] != 'NA':
+            if is_spouse_a_child(family["HUSB"], family["WIFE"]):
+                anomaly_array.append("ANOMALY: INDIVIDUAL: US17: {}: {}: Individual married to child {}"\
+                                    .format(family["HUSB_LINE"], family["HUSB"], family["WIFE"]))
+            if is_spouse_a_child(family["WIFE"], family["HUSB"]):
+                anomaly_array.append("ANOMALY: INDIVIDUAL: US17: {}: {}: Individual married to child {}"\
+                                    .format(family["WIFE_LINE"], family["WIFE"], family["HUSB"]))
+
+
+def is_spouse_a_child(individual_id, spouse_id):
+    individual_object = individuals[individual_id]
+    if 'SPOUSE' in individual_object and individual_object['SPOUSE'] != 'NA':
+        for spouse_fam in individual_object['SPOUSE']:
+            if spouse_fam in family_dic:
+                family = family_dic[spouse_fam]
+                if "FAM_CHILD" in family and spouse_id in family["FAM_CHILD"]:
+                    return True
+        return False
+
+
 #User_Story_20 Aunts and uncles
 #Aunts and uncles should not marry their nieces or nephews
 def is_uncle_aunt_marriage_legal():
