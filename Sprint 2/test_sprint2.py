@@ -197,6 +197,62 @@ def test_birth_after_marraige_appended_to_error():
     assert sprint2.anomaly_array[0] == "ERROR: INDIVIDUAL: US02: @I1@: Person has marriage date 1968-6-4 before birth date 1970-11-8"
     return True
 
+
+def test_check_positive_for_bigamy():
+    family_dic = {'@F1@': {'MARR': '2010-10-18','DIV': '2015-12-10'}, '@F2@': {'MARR': '2012-10-18','DIV': '2018-12-10'}}
+    individuals = {'@I1@': {'SPOUSE': ['@F1@', '@F2@'], 'INDI_LINE': '10', 'INDI': '@I1@'}, '@I2': {'SPOUSE': ['@F1@']}, '@I3': {'SPOUSE': ['@F2@']}}
+    
+    sprint2.family_dic = family_dic
+    sprint2.anomaly_array = []
+    sprint2.individuals = individuals
+    sprint2.check_for_bigamy()
+    
+    assert sprint2.anomaly_array[0] == 'ANOMALY: INDIVIDUAL: US11: 10: @I1@: Performing bigamy'
+    
+    return True
+
+def test_check_negative_for_bigamy():
+    family_dic = {'@F1@': {'MARR': '2010-10-18','DIV': '2015-12-10'}, '@F2@': {'MARR': '2016-10-18','DIV': '2018-12-10'}}
+    individuals = {'@I1': {'SPOUSE': ['@F1@', '@F2@']}, '@I2': {'SPOUSE': ['@F1@']}, '@I3': {'SPOUSE': ['@F2@']}}
+    
+    sprint2.family_dic = family_dic
+    sprint2.anomaly_array = []
+    sprint2.individuals = individuals
+    sprint2.check_for_bigamy()
+    
+    assert len(sprint2.anomaly_array) == 0
+    
+    return True
+
+
+def test_check_positive_parent_child_marriage():
+    family_dic = {'@F1@': {'HUSB': '@I1@', 'WIFE': '@I2@','FAM_CHILD': ['@I3@']},'@F2@': {'HUSB': '@I3@','WIFE': '@I2@', 'WIFE_LINE': '11'}}
+    individuals = {'@I1@': {'SPOUSE': ['@F1@']}, '@I2@': {'SPOUSE': ['@F1@', '@F2@']},'@I3@': {'SPOUSE': ['@F2@']}}
+    
+    sprint2.family_dic = family_dic
+    sprint2.anomaly_array = []
+    sprint2.individuals = individuals
+    sprint2.check_parent_child_marriage()
+    
+    assert sprint2.anomaly_array[0] == "ANOMALY: INDIVIDUAL: US17: 11: @I2@: Individual married to child @I3@"
+    
+    return True
+
+def test_check_negative_parent_child_marriage():
+    family_dic = {'@F1@': {'HUSB': '@I1@', 'WIFE': '@I2@','FAM_CHILD': ['@I3@']},'@F2@': {'HUSB': '@I4@','WIFE': '@I2@'}}
+    individuals = {'@I1@': {'SPOUSE': ['@F1@']}, '@I2@': {'SPOUSE': ['@F1@', '@F2@']},'@I3@': {'SPOUSE': 'NA'}, '@I4@': {'SPOUSE': ['@F2@']}}
+    
+    sprint2.family_dic = family_dic
+    sprint2.anomaly_array = []
+    sprint2.individuals = individuals
+    sprint2.check_parent_child_marriage()
+    
+    assert len(sprint2.anomaly_array) == 0
+    
+    return True
+    
+
+
 # User_Story_29: List all deceased individuals in a GEDCOM file
 # Success test 
 @mock.patch("sprint2.printTable")
@@ -1144,7 +1200,17 @@ class TestUserStory(unittest.TestCase):
         """Test Case US32 """
         self.assertTrue(test_multiple_birth_fail())
 
+    def test_Check_Positive_For_Bigamy(self):
+        self.assertTrue(test_check_positive_for_bigamy())
 
+    def test_Check_Negative_For_Bigamy(self):
+        self.assertTrue(test_check_negative_for_bigamy())
+
+    def test_check_positive_parent_child_marriage(self):
+        self.assertTrue(test_check_positive_parent_child_marriage())
+
+    def test_check_negative_parent_child_marriage(self):
+        self.assertTrue(test_check_negative_parent_child_marriage())
 
 	
 	
