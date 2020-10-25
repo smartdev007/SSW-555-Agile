@@ -416,7 +416,37 @@ def multiple_birth():
                 else:          
                     li[temp]=child["INDI"]                                                 
    
+# US04 - Marriage Before Divorce
 
+def is_marriage_after_divorce():
+    # Iterating through all individuals
+    for currentIndividual in individuals.values():
+        # Ignoring all individuals who weren't ever married
+        if(currentIndividual['SPOUSE'] != 'NA'):
+            # Iterating through all the families they were related to
+            for currentFamily in currentIndividual['SPOUSE']:
+                for checkingFamily in family_dic.values():
+                    if(checkingFamily['FAM'] == currentFamily):
+                        # Ignoring all the marriages without a divorce
+                        if(checkingFamily['DIV'] != 'NA'):
+                            # Checking if a divorce date is before a marriage date
+                            if(checkingFamily['MARR'] > checkingFamily['DIV']):
+                                anomaly_array.append("ANOMALY: INDIVIDUAL: US04: {}: {}: Marriage Before Divorce - Marriage Date {} - Divorce Date {}".format(checkingFamily["MARR_LINE"], currentIndividual['INDI'], checkingFamily['MARR'], checkingFamily['DIV']))
+
+# US05 - Marriage Before Death
+
+def is_marriage_after_death():
+    # Iterating through all individuals
+    for currentIndividual in individuals.values():
+        # Ignoring all individuals who weren't ever married
+        if(currentIndividual['SPOUSE'] != 'NA'):
+            # Iterating through all the families they were related to
+            for currentFamily in currentIndividual['SPOUSE']:
+                for checkingFamily in family_dic.values():
+                    if(checkingFamily['FAM'] == currentFamily):
+                        if(checkingFamily['MARR'] != 'NA'):
+                            if(checkingFamily['MARR'] > currentIndividual['DEAT']):
+                                anomaly_array.append("ANOMALY: INDIVIDUAL: US05: {}: {}: Marriage Before Death - Marriage Date {} - Death Date {}".format(checkingFamily["MARR_LINE"], currentIndividual['INDI'], checkingFamily['MARR'], currentIndividual['DEAT']))
 
 
 
