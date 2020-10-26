@@ -990,7 +990,33 @@ def test_multiple_birth_pass():
     return sprint2.anomaly_array==['ANOMALY: FAMILY: US32: 365: The two or more individuals were born at the same time in a family @F3@']
     return True
     
-# US32 Multiple birth fail
+def input_line_numbers():
+    sprint2.input_file = "./test.ged"
+    document = sprint2.read_in("./test.ged")
+    person01 = document["INDI"][0]
+    person02 = document["INDI"][1]
+    fam = document["FAM"][0]
+    
+    #Test Richard
+    assert person01["INDI_LINE"] == 15
+    assert person01["NAME_LINE"] == 16
+    assert person01["SEX_LINE"] == 20
+    assert person01["BIRT_LINE"] == 21
+    assert person01["FAMS_LINE"] == 23
+    #Test lyra
+    assert person02["INDI_LINE"] == 24
+    assert person02["NAME_LINE"] == 25
+    assert person02["SEX_LINE"] == 29
+    assert person02["BIRT_LINE"] == 30
+    assert person02["FAMS_LINE"] == 32
+    #Test Richard and Lyra family
+    assert fam["FAM_LINE"] == 183
+    assert fam["HUSB_LINE"] == 184
+    assert fam["WIFE_LINE"] == 185
+    assert fam["MARR_LINE"] == 190
+                           
+    return True
+
 def test_multiple_birth_fail():
     family_dic = {'@F3@': {'FAM': '@F3@',
       'HUSB_NAME': 'Johnny /Malagon/',
@@ -1491,6 +1517,131 @@ def test_is_marriage_after_death_error():
     assert sprint2.anomaly_array[0] == "ANOMALY: INDIVIDUAL: US05: 438: @I1@: Marriage Before Death - Marriage Date 1970-7-7 - Death Date 1969-6-20"
     return True
 
+def test_large_age_diff_pass():
+    family_dic = {'@F4@': {'FAM': '@F4@',
+      'FAM_LINE': 388,
+      'HUSB_NAME': 'Josh /Malagon/',
+      'HUSB_LINE': 389,
+      'HUSB': '@I5@',
+      'WIFE_NAME': 'Cinda /Burgard/',
+      'WIFE_LINE': 390,
+      'WIFE': '@I8@',
+      'FAM_CHILD': ['@I10@'],
+      'CHIL_LINE_@I10@': 391,
+      'CHIL': '@I10@',
+      'CHIL_LINE': 391,
+      'MARR_LINE': 392,
+      'MARR': '1978-9-2',
+      'DIV': 'NA',
+      'husband_object': {'INDI': '@I5@',
+       'INDI_LINE': 52,
+       'NAME': 'Josh /Malagon/',
+       'NAME_LINE': 53,
+       'SEX': 'M',
+       'SEX_LINE': 57,
+       'BIRT_LINE': 58,
+       'BIRT': '1964-10-31',
+       'DEAT_LINE': 60,
+       'DEAT': '1984-5-7',
+       'INDI_CHILD': ['@F2@'],
+       'SPOUSE': ['@F4@'],
+       'FAMS_LINE': 62,
+       'FAMC_LINE': 63,
+       'AGE': '19',
+       'ALIVE': False},
+      'wife_object': {'INDI': '@I8@',
+       'INDI_LINE': 83,
+       'NAME': 'Cinda /Burgard/',
+       'NAME_LINE': 84,
+       'SEX': 'F',
+       'SEX_LINE': 88,
+       'BIRT_LINE': 89,
+       'BIRT': '1966-8-8',
+       'INDI_CHILD': 'NA',
+       'SPOUSE': ['@F4@', '@F6@', '@F7@'],
+       'FAMS_LINE': 93,
+       'DEAT': 'NA',
+       'AGE': '53',
+       'ALIVE': True},
+      'children_objects': [{'INDI': '@I10@',
+        'INDI_LINE': 103,
+        'NAME': 'Ruthe /Malagon/',
+        'NAME_LINE': 104,
+        'SEX': 'F',
+        'SEX_LINE': 108,
+        'BIRT_LINE': 109,
+        'BIRT': '1977-9-8',
+        'INDI_CHILD': ['@F4@'],
+        'SPOUSE': 'NA',
+        'FAMC_LINE': 111,
+        'DEAT': 'NA',
+        'AGE': '42',
+        'ALIVE': True}]}}
+    
+    
+    sprint2.family_dic = family_dic
+    sprint2.anomaly_array = []
+    sprint2.large_age_diff()
+
+    return sprint2.anomaly_array==['ANOMALY: FAMILY: US34: 388: Family with unique id: @F4@ has a large spouse age difference']
+    return True
+
+def test_large_age_diff_fail():
+    family_dic = {'@F6@': {'FAM': '@F6@',
+      'FAM_LINE': 399,
+      'HUSB_NAME': 'Jerrell /Finklea/',
+      'HUSB_LINE': 400,
+      'HUSB': '@I9@',
+      'WIFE_NAME': 'Cinda /Burgard/',
+      'WIFE_LINE': 401,
+      'WIFE': '@I8@',
+      'FAM_CHILD': ['@I11@', '@I19@'],
+      'CHIL_LINE_@I11@': 402,
+      'CHIL': '@I19@',
+      'CHIL_LINE': 403,
+      'CHIL_LINE_@I19@': 403,
+      'MARR_LINE': 404,
+      'MARR': '1985-4-5',
+      'DIV': 'NA',
+      'husband_object': {'INDI': '@I9@',
+       'INDI_LINE': 94,
+       'NAME': 'Jerrell /Finklea/',
+       'NAME_LINE': 95,
+       'SEX': 'M',
+       'SEX_LINE': 99,
+       'BIRT_LINE': 100,
+       'BIRT': '1965-9-8',
+       'INDI_CHILD': 'NA',
+       'SPOUSE': ['@F6@'],
+       'FAMS_LINE': 102,
+       'DEAT': 'NA',
+       'AGE': '54',
+       'ALIVE': True},
+      'wife_object': {'INDI': '@I8@',
+       'INDI_LINE': 83,
+       'NAME': 'Cinda /Burgard/',
+       'NAME_LINE': 84,
+       'SEX': 'F',
+       'SEX_LINE': 88,
+       'BIRT_LINE': 89,
+       'BIRT': '1966-8-8',
+       'INDI_CHILD': 'NA',
+       'SPOUSE': ['@F4@', '@F6@', '@F7@'],
+       'FAMS_LINE': 93,
+       'DEAT': 'NA',
+       'AGE': '53',
+       'ALIVE': True}}}
+    
+    
+    sprint2.family_dic = family_dic
+    sprint2.anomaly_array = []
+    sprint2.large_age_diff()
+
+    return len(sprint2.anomaly_array) == 0
+    return True
+
+
+
 class TestUserStory(unittest.TestCase):
     """ Test case for user story """
 
@@ -1499,6 +1650,8 @@ class TestUserStory(unittest.TestCase):
         """ Test case for user story 1 to check for Date before current date """
         self.assertFalse(test_dates_error('2021-05-15','2022-02-20','2021-06-17','2022-07-25'))
         self.assertFalse(test_dates_error('2022-05-15','2024-05-25','2051-06-17','2022-07-25'))
+    def test_input_line_numbers_pass(self):
+        self.assertTrue(input_line_numbers());
 
     def test_Dates_After_Today_pass(self):
         """ Test case for user story 1 to check for Date before current date """
@@ -1658,7 +1811,12 @@ class TestUserStory(unittest.TestCase):
     def test_is_marriage_after_death_error(self):
         self.assertTrue(test_is_marriage_after_death_error())
 	
-	
+    def test_large_age_diff_pass(self):
+        self.assertTrue(test_large_age_diff_pass())
+    
+    def test_large_age_diff_fail(self):
+        self.assertTrue(test_large_age_diff_fail())
+
 if __name__ == '__main__':
     """ Run test cases on startup """
     unittest.main(exit=False, verbosity=2)

@@ -45,6 +45,50 @@ def create_family_dic():
 
         family_dic[family["FAM"]] = family
 
+# create dictionary entry for the passed tag
+# :param current_arr is the current array line being processed
+# :param tag can will be either FAM or INDI
+def create_dic_entry(current_arr, tag):
+    current_tag=tag
+    dic={}
+    dic[tag]=current_arr[1]
+    return dic, current_tag
+
+    for family in document["FAM"]:
+        if family["HUSB"] != "NA" and family["HUSB"] in individuals:
+            family["husband_object"] = individuals[family["HUSB"]]
+
+        if family["WIFE"] != "NA" and family["WIFE"] in individuals:
+            family["wife_object"] = individuals[family["WIFE"]]
+
+        if family["FAM_CHILD"] != "NA":
+            children = []
+
+            for child in family["FAM_CHILD"]:
+                children.append(individuals[child])
+
+            family["children_objects"] = children
+
+        family_dic[family["FAM"]] = family
+
+
+# Adds missing tags with "NA"
+def add_missing_entries(dic):
+    if "DIV" not in dic:
+        dic["DIV"] = "NA"
+    if "HUSB" not in dic:
+        dic["HUSB"] = "NA"
+    if "HUSB_NAME" not in dic:
+        dic["HUSB_NAME"] = "NA"
+    if "WIFE" not in dic:
+        dic["WIFE"] = "NA"
+    if "WIFE_NAME" not in dic:
+        dic["WIFE_NAME"] = "NA"
+    if "FAM_CHILD" not in dic:
+        dic["FAM_CHILD"] = "NA"
+    if "MARR" not in dic:
+        dic["MARR"] = "NA"
+
 def is_marriage_legal():
     """ US10 Marriage after 14 """
     for family_id in family_dic:
@@ -448,6 +492,23 @@ def is_marriage_after_death():
                             if(checkingFamily['MARR'] > currentIndividual['DEAT']):
                                 anomaly_array.append("ANOMALY: INDIVIDUAL: US05: {}: {}: Marriage Before Death - Marriage Date {} - Death Date {}".format(checkingFamily["MARR_LINE"], currentIndividual['INDI'], checkingFamily['MARR'], currentIndividual['DEAT']))
 
+# US34 List large age difference
+
+def large_age_diff():
+    
+    for value in family_dic.values():
+    #for family_id in family_dic:
+        family= value["FAM"]
+        if "husband_object" in family_dic[family]:
+            husband=family_dic[family]["husband_object"]
+            hage = int(husband["AGE"])
+        if "wife_object" in family_dic[family]:
+            wife=family_dic[family]["wife_object"]
+            wage = int(wife["AGE"])
+            agediff = hage/wage
+            if agediff>=2 or agediff<=0.5:
+                anomaly_array.append("ANOMALY: FAMILY: US34: {}: Family with unique id: {} has a large spouse age difference".format(value["FAM_LINE"], value["FAM"]))
+
 
 
 
@@ -495,94 +556,92 @@ def find_name(arr, _id):
         if _id == indi["INDI"]:
             return indi["NAME"]
 
+# Reads the input GEDCOM file line by line and store the data into the dictionary
 def read_in(file):
-    doc = {"INDI": [], "FAM": []}
-    dic = {}
-    flag = False
-
+    doc={"INDI":[], "FAM":[]}
+    dic={}
+    flag=False #indicates whether the correct tag has appeared before DATE tag
     with open(file) as f:
-        all_lines = f.readlines()
+        all_lines=f.readlines()
+        line_num = 1; #line number of each 
         for line, next_line in zip(all_lines, all_lines[1:]):
-            current_arr = line.strip().split(" ")
-            next_arr = next_line.strip().split(" ")
-            
-            if len(current_arr) == 3 and current_arr[0] == '0' and current_arr[2] == "INDI":
-                current_tag = "INDI"
-                dic = {}
-                dic["INDI"] = current_arr[1]
-            elif len(current_arr) == 3 and current_arr[0] == '0' and current_arr[2] == "FAM": 
-                current_tag = "FAM"
-                dic = {}
-                dic["FAM"] = current_arr[1]
-            elif (current_arr[1] == "DATE" and flag):
-                flag = False
-                date_arr = current_arr[2:]
-                dic[tmp] = convert_date(date_arr)
-            elif current_arr[0] == '1' and current_arr[1] in supported_tag:
-                if (isDateParent(current_arr)):
-                    tmp = current_arr[1]
-                    flag = True
+            current_arr=line.strip().split(" ")
+            next_arr=next_line.strip().split(" ")
+            #if the current tag is individual
+            if len(current_arr)==3 and current_arr[0]=='0' and current_arr[2]== "INDI":
+                #inserts individual's ID into the dictionary
+                dic, current_tag=create_dic_entry(current_arr, "INDI") 
+                #inserts line number
+                dic["INDI_LINE"] = line_num
+            #if the current tag is family
+            elif len(current_arr)==3 and current_arr[0]=='0' and current_arr[2]=="FAM": 
+                dic, current_tag=create_dic_entry(current_arr, "FAM")
+                #inserts line number
+                dic["FAM_LINE"] = line_num
+            #if the current tag is date
+            elif current_arr[1]=="DATE" and flag:
+                flag=False
+                date_arr = current_arr[2:] #extracts the date argument from the line
+                dic[tmp]= convert_date(date_arr) #converts the date into correct format
+            #determines if the tag level is correct
+            elif current_arr[0]=='1' and current_arr[1] in supported_tag:
+            #"NAME", "SEX", "BIRT", "DEAT","FAMC","FAMS","MARR", "DIV","HUSB","WIFE","CHIL"
+                if (isDateParent(current_arr)): #determines whether the current tag is parent of DATE tag
+                    tmp=current_arr[1] #extracts the tag name
+                    flag=True
+                    #inserts line number
+                    dic[tmp + "_LINE"] = line_num
                 else: 
+                    #current tag is not the parent tag of DATE tag
                     if current_arr[1] == "HUSB":
-                        husband = find_name(doc["INDI"], current_arr[2])
-                        dic["HUSB_NAME"] = husband
+                        dic["HUSB_NAME"]=find_name(doc["INDI"], current_arr[2])
+                        #inserts line number
+                        dic["HUSB_LINE"] = line_num
                     if current_arr[1] == "WIFE":
-                        husband = find_name(doc["INDI"], current_arr[2])
-                        dic["WIFE_NAME"] = husband
+                        dic["WIFE_NAME"]=find_name(doc["INDI"], current_arr[2])
+                        #inserts line number
+                        dic["WIFE_LINE"] = line_num
                     if current_arr[1] == 'CHIL':
+                        #INDI_CHILD indicates all the children within a family
                         children = dic["FAM_CHILD"] if "FAM_CHILD" in dic else []
-                        children.append(f"{current_arr[2].strip('@')}")
+                        children.append(current_arr[2])
                         dic["FAM_CHILD"] = children
+                        #inserts line number
+                        dic["CHIL_LINE_" + current_arr[2]] = line_num
                     if current_arr[1] == 'FAMC' or current_arr[1] == 'FAMS':
                         child = dic["INDI_CHILD"] if "INDI_CHILD" in dic else []
                         spouse = dic["SPOUSE"] if "SPOUSE" in dic else []
-                        if current_arr[1] == 'FAMC':
-                            child.append(f"{current_arr[2].strip('@')}")
-                        else:
-                            spouse.append(f"{current_arr[2].strip('@')}")
-                        dic['INDI_CHILD'] = child
+                        child.append(current_arr[2]) if current_arr[1] == 'FAMC' else spouse.append(current_arr[2])
+                        dic['INDI_CHILD'] = child #FAM_CHILD indicates which family this individual belongs to
                         dic['SPOUSE'] = spouse
-                    else:
-                        dic[current_arr[1]] = ' '.join(current_arr[2:])
-
-            if (len(next_arr) == 3 and next_arr[0] =='0' and next_arr[2] in def_tag) or next_arr[1] == "TRLR":
-                if dic:
-                    if current_tag == 'INDI':
+                        #inserts line number
+                        dic[current_arr[1] + "_LINE"] = line_num
+                    else: #other type of tag
+                        dic[current_arr[1]]=' '.join(current_arr[2:])
+                        #inserts line number
+                        dic[current_arr[1] + "_LINE"] = line_num
+            #TRLR ==> end of the GEDCOM file
+            if (len(next_arr)==3 and next_arr[0]=='0' and next_arr[2] in def_tag) or next_arr[1]=="TRLR":
+                if dic: #if the dic exists or not
+                    if current_tag == 'INDI': #under individual tag?
                         if 'DEAT' in dic:
                             age = determine_age(dic['BIRT'], dic['DEAT'])
                             alive = False
                         else:
                             age = determine_age(dic['BIRT'], None)
                             alive = True
-                            dic['DEAT'] = 'NA'
+                            dic['DEAT'] = "NA"
                         dic["AGE"] = str(age)
-                        dic['ALIVE'] = alive
-                        
+                        dic['ALIVE']= alive
                         if not dic["SPOUSE"]:
-                            dic["SPOUSE"] = ["NA"]
+                            dic["SPOUSE"] = "NA"
                         elif not dic["INDI_CHILD"]:
-                            dic["INDI_CHILD"] = ["NA"]
-
+                            dic["INDI_CHILD"] = "NA"
                     if current_tag == 'FAM':
-                        if "DIV" not in dic:
-                            dic["DIV"] = ["NA"]
-                        if "HUSB" not in dic:
-                            dic["HUSB"] = ["NA"]
-                        if "HUSB_NAME" not in dic:
-                            dic["HUSB_NAME"] = ["NA"]
-                        if "WIFE" not in dic:
-                            dic["WIFE"] = ["NA"]
-                        if "WIFE_NAME" not in dic:
-                            dic["WIFE_NAME"] = ["NA"]
-                        if "FAM_CHILD" not in dic:
-                            dic["FAM_CHILD"] = ["NA"]
-                        if "MARR" not in dic:
-                            dic["MARR"] = ["NA"]   
-
-                    doc[current_tag].append(dic)
-                    
-        return doc   
-                  
+                        add_missing_entries(dic)
+                    doc[current_tag].append(dic) 
+            line_num += 1 #increments the line counter by 1
+        return doc                  
 
 document = read_in("./test.ged")
 
