@@ -625,6 +625,108 @@ def get_all_children(individual_object):
 
     return children
 
+def list_upcoming_bday():
+    """ US38: List all living people in a GEDCOM file whose birthdays occur in the next 30 days """
+
+    today_month = int(datetime.today().strftime("%m"))
+    today_date = int(datetime.today().strftime("%d"))
+    
+    current_dic = {}
+    bday_count = 0
+    result = True
+    
+    for value in individuals.values():
+        if (value["BIRT"] == 'NA'):
+            error_array.append(f'ERROR: INDIVIDUAL: US38: {value["BIRT_LINE"]}: Person {value["BIRT"]} does not have birthday!')
+            result = False
+        else:
+            current_birt = value["BIRT"]
+            current_month = int(current_birt.split("-")[1])
+            current_date = int(current_birt.split("-")[2])
+            day_difference = (current_month - today_month)* 30 + (current_date- today_date)
+
+            if (day_difference > 0 and day_difference <= 30):
+                current_dic[value["INDI"]] = value
+                bday_count += 1
+
+    if bday_count > 0:
+        allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
+        tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
+
+        printTable("US38 List Upcoming Birthdays Table", allFields, tagNames, current_dic)
+        
+    return result
+
+def list_upcoming_anni():
+    """ US39: List all living couples in a GEDCOM file whose marriage anniversaries occur in the next 30 days """
+
+    today_month = int(datetime.today().strftime("%m"))
+    today_date = int(datetime.today().strftime("%d"))
+    current_dic = {}
+    marr_count = 0
+    result = True
+
+    for value in family_dic.values():
+        if (value["MARR"] == 'NA'):
+            error_array.append(f'ERROR: FAMILY: US39: {value["FAM_LINE"]}: Family {value["FAM"]} does not have married date!')
+            result = False
+        else:
+            current_marr = value["MARR"]
+            current_month = int(current_marr.split("-")[1])
+            current_date = int(current_marr.split("-")[2])
+            day_difference = (current_month - today_month) * 30 + (current_date - today_date)
+
+            if (day_difference > 0 and day_difference <= 30):
+                current_dic[value["FAM"]] = value
+                marr_count += 1
+
+    if marr_count > 0:
+        allFields = ["ID", "Married", "Husband ID", "Husband Name", "Wife ID", "Wife Name"]
+        tagNames = ["FAM", "MARR", "HUSB", "HUSB_NAME", "WIFE", "WIFE_NAME"]
+
+        printTable("US39: List Upcoming Anniversaries Table", allFields, tagNames, current_dic)
+        
+    return result
+
+def printTable(table_name, fields, tag_names, dictionary):
+    """ Print table for US38 and US39 """
+
+    print(table_name)
+
+    table = PrettyTable()
+    table.field_names = fields
+
+    for element in dictionary.values():    
+        count = 1
+        row_data = ""
+
+        for name in tag_names:
+            if (count < int(len(tag_names))):
+                if (isinstance(element[name], list)):
+                    row_data += (",".join(element[name]) + "? ")
+                else: #current element is not an array
+                    row_data += (str(element[name]) + "? ")
+            elif (count == int(len(tag_names))):
+                if (isinstance(element[name], list)):
+                    row_data += (",".join(element[name]))
+                else:
+                    row_data += (str(element[name]))
+                break
+
+            count+= 1
+        table.add_row(row_data.split('?'))
+    
+    storeResults(table_name, table.get_string())
+    print(table)
+
+def storeResults(result_name, outputs):
+    """ Store US38 and US39 output in a file """
+
+    file = open("US38_39_Output.txt", "a")
+    file.write(result_name + "\n")
+    file.write(outputs + "\n\n")
+    file.close()
+
 # Stores all Project outputs into a single text file
 # Parameters:
 # result_name: name that will appear 
