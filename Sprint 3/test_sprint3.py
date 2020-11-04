@@ -1852,6 +1852,220 @@ def test_check_sibling_spacing_siblings_1_day_apart():
     
     return True
 
+def test_list_upcoming_bday_pass():
+    """ Test case for US38 (pass) """
+
+    from datetime import datetime
+    from datetime import timedelta
+    
+    individuals = {'@I1@': {'INDI': '@I1@', 
+                            'INDI_LINE': 14, 
+                            'NAME': 'David /Chang/', 
+                            'NAME_LINE': 15, 
+                            'SEX': 'M', 
+                            'SEX_LINE': 19, 
+                            'BIRT': '1988-11-9', 
+                            'INDI_CHILD': ['@F1@'], 
+                            'SPOUSE': 'NA', 
+                            'FAMC_LINE': 22, 
+                            'DEAT': 'NA', 
+                            'BIRT_LINE': 22, 
+                            'AGE': '31', 
+                            'ALIVE': True}}
+    
+    current_date = datetime.today() + timedelta(days=10)
+    individuals["@I1@"]["BIRT"] = current_date.strftime("%Y-%m-%d")
+    
+    sprint3.individuals = individuals
+
+    assert sprint3.list_upcoming_bday() == True
+
+    return True
+
+def test_list_upcoming_bday_fail():
+    """ Test case for US38 (fail) """
+
+    individuals = {'@I1@': {'INDI': '@I1@', 
+                            'INDI_LINE': 14, 
+                            'NAME': 'David /Chang/', 
+                            'NAME_LINE': 15, 
+                            'SEX': 'M', 
+                            'SEX_LINE': 19, 
+                            'BIRT': 'NA', 
+                            'INDI_CHILD': ['@F1@'], 
+                            'SPOUSE': 'NA', 
+                            'FAMC_LINE': 22, 
+                            'DEAT': 'NA', 
+                            'BIRT_LINE': 22, 
+                            'AGE': '31', 
+                            'ALIVE': True}, 
+                    '@I2@': {'INDI': '@I2@', 
+                            'INDI_LINE': 23, 
+                            'NAME': 'Johny /Chang/', 
+                            'NAME_LINE': 24, 
+                            'SEX': 'M', 
+                            'SEX_LINE': 28, 
+                            'BIRT': '1958-11-25', 
+                            'INDI_CHILD': 'NA', 
+                            'SPOUSE': ['@F1@'], 
+                            'FAMS_LINE': 31, 
+                            'DEAT': 'NA', 
+                            'BIRT_LINE': 31, 
+                            'AGE': '61', 
+                            'ALIVE': True}, 
+                    '@I3@': {'INDI': '@I3@', 
+                            'INDI_LINE': 32, 
+                            'NAME': 'Nancy /Tsai/', 
+                            'NAME_LINE': 33, 
+                            'SEX': 'F', 
+                            'SEX_LINE': 37, 
+                            'BIRT': '1960-9-6', 
+                            'INDI_CHILD': 'NA', 
+                            'SPOUSE': ['@F1@'], 
+                            'FAMS_LINE': 40, 
+                            'DEAT': 'NA', 
+                            'BIRT_LINE': 40, 
+                            'AGE': '59', 
+                            'ALIVE': True}}
+    
+    sprint3.individuals = individuals
+
+    return sprint3.list_upcoming_bday() == False
+
+def test_list_upcoming_anni_pass():
+    """ Test case for US39 (pass) """
+    from datetime import datetime
+    from datetime import timedelta
+    
+    family_dic = {'@F1@': {'FAM': '@F1@', 
+                            'FAM_LINE': 47, 
+                            'HUSB_NAME': 'Johny /Chang/', 
+                            'HUSB_LINE': 42, 
+                            'HUSB': '@I2@', 
+                            'WIFE_NAME': 'Nancy /Tsai/', 
+                            'WIFE_LINE': 43, 
+                            'WIFE': '@I3@', 
+                            'FAM_CHILD': ['@I1@'], 
+                            'CHIL_LINE': 44, 
+                            'CHIL': '@I1@', 
+                            'MARR': '1980-3-2', 
+                            'DIV': 'NA', 
+                    'husband_object': {'INDI': '@I2@', 
+                                        'INDI_LINE': 23, 
+                                        'NAME': 'Johny /Chang/', 
+                                        'NAME_LINE': 24, 
+                                        'SEX': 'M', 
+                                        'SEX_LINE': 28, 
+                                        'BIRT': '1958-8-9', 
+                                        'INDI_CHILD': 'NA', 
+                                        'SPOUSE': ['@F1@'], 
+                                        'FAMS_LINE': 31, 
+                                        'DEAT': 'NA', 
+                                        'BIRT_LINE': 31, 
+                                        'AGE': '61', 
+                                        'ALIVE': True}, 
+                    'wife_object': {'INDI': '@I3@', 
+                                    'INDI_LINE': 32, 
+                                    'NAME': 'Nancy /Tsai/', 
+                                    'NAME_LINE': 33, 
+                                    'SEX': 'F', 
+                                    'SEX_LINE': 37, 
+                                    'BIRT': '1960-9-6', 
+                                    'INDI_CHILD': 'NA', 
+                                    'SPOUSE': ['@F1@'], 
+                                    'FAMS_LINE': 40, 
+                                    'DEAT': 'NA', 
+                                    'BIRT_LINE': 40, 
+                                    'AGE': '59', 
+                                    'ALIVE': True}, 
+                    'children_objects': [{'INDI': '@I1@', 
+                                        'INDI_LINE': 14, 
+                                        'NAME': 'David /Chang/', 
+                                        'NAME_LINE': 15, 
+                                        'SEX': 'M', 
+                                        'SEX_LINE': 19, 
+                                        'BIRT': '1988-7-9', 
+                                        'INDI_CHILD': ['@F1@'], 
+                                        'SPOUSE': 'NA', 
+                                        'FAMC_LINE': 22, 
+                                        'DEAT': 'NA', 
+                                        'BIRT_LINE': 22, 
+                                        'AGE': '31', 
+                                        'ALIVE': True}]}}
+
+    current_date = datetime.today() + timedelta(days=10)
+    family_dic["@F1@"]["MARR"] = current_date.strftime("%Y-%m-%d")
+    sprint3.family_dic = family_dic
+
+    assert sprint3.list_upcoming_anni() == True
+
+    return True
+
+def test_list_upcoming_anni_fail():
+    """ Test case for US39 (fail) """
+
+    family_dic = {'@F1@': {'FAM': '@F1@', 
+                            'FAM_LINE': 47, 
+                            'HUSB_NAME': 'Johny /Chang/', 
+                            'HUSB_LINE': 42, 
+                            'HUSB': '@I2@', 
+                            'WIFE_NAME': 'Nancy /Tsai/', 
+                            'WIFE_LINE': 43, 
+                            'WIFE': '@I3@', 
+                            'FAM_CHILD': ['@I1@'], 
+                            'CHIL_LINE': 44, 
+                            'CHIL': '@I1@', 
+                            'MARR': 'NA', 
+                            'DIV': 'NA', 
+                            'husband_object': {'INDI': '@I2@', 
+                                                'INDI_LINE': 23, 
+                                                'NAME': 'Johny /Chang/', 
+                                                'NAME_LINE': 24, 
+                                                'SEX': 'M', 
+                                                'SEX_LINE': 28, 
+                                                'BIRT': '1958-8-9', 
+                                                'INDI_CHILD': 'NA', 
+                                                'SPOUSE': ['@F1@'], 
+                                                'FAMS_LINE': 31, 
+                                                'DEAT': 'NA', 
+                                                'BIRT_LINE': 31, 
+                                                'AGE': '61', 
+                                                'ALIVE': True}, 
+                            'wife_object': {'INDI': '@I3@', 
+                                            'INDI_LINE': 32, 
+                                            'NAME': 'Nancy /Tsai/', 
+                                            'NAME_LINE': 33, 
+                                            'SEX': 'F', 
+                                            'SEX_LINE': 37, 
+                                            'BIRT': '1960-9-6', 
+                                            'INDI_CHILD': 'NA', 
+                                            'SPOUSE': ['@F1@'], 
+                                            'FAMS_LINE': 40, 
+                                            'DEAT': 'NA', 
+                                            'BIRT_LINE': 40, 
+                                            'AGE': '59', 
+                                            'ALIVE': True}, 
+                            'children_objects': [{'INDI': '@I1@', 
+                                                'INDI_LINE': 14, 
+                                                'NAME': 'David /Chang/', 
+                                                'NAME_LINE': 15, 
+                                                'SEX': 'M', 
+                                                'SEX_LINE': 19, 
+                                                'BIRT': '1988-7-9', 
+                                                'INDI_CHILD': ['@F1@'], 
+                                                'SPOUSE': 'NA', 
+                                                'FAMC_LINE': 22, 
+                                                'DEAT': 'NA', 
+                                                'BIRT_LINE': 22, 
+                                                'AGE': '31', 
+                                                'ALIVE': True}]}}
+    
+    sprint3.family_dic = family_dic
+
+    return sprint3.list_upcoming_anni() == False
+
+
+
 
 
 class TestUserStory(unittest.TestCase):
@@ -2044,6 +2258,22 @@ class TestUserStory(unittest.TestCase):
     def test_check_sibling_spacing_siblings_1_day_apart(self):
         """ Test case for user story 13 to check if birth dates of siblings is less than 2 days apart """
         self.assertTrue(test_check_sibling_spacing_siblings_1_day_apart())
+
+    def test_list_upcoming_bday_pass(self):
+        """ Test case for user story 38 to check for birthdays which occurs in next 30 days (pass) """
+        self.assertTrue(test_list_upcoming_bday_pass())
+
+    def test_list_upcoming_bday_fail(self):
+        """ Test case for user story 38 to check for birthdays which occurs in next 30 days (fail) """
+        self.assertTrue(test_list_upcoming_bday_fail())
+
+    def test_list_upcoming_anni_pass(self):
+        """ Test case for user story 39 to check for marriage anniversaries that occurs in the next 30 days (pass) """
+        self.assertTrue(test_list_upcoming_anni_pass())
+
+    def test_list_upcoming_anni_fail(self):
+        """ Test case for user story 39 to check for marriage anniversaries that occurs in the next 30 days (fail) """
+        self.assertTrue(test_list_upcoming_anni_fail())
 
 if __name__ == '__main__':
     """ Run test cases on startup """
