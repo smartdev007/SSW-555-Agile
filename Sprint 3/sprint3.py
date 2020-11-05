@@ -89,6 +89,53 @@ def add_missing_entries(dic):
     if "MARR" not in dic:
         dic["MARR"] = "NA"
 
+
+
+#US03 - Birth Before Death - The birth of an individual SHOULD occur before his/her death
+
+def is_birth_before_death():
+    for currentIndividual in individuals.values():
+        if(currentIndividual['BIRT'] == 'NA'):
+            error_array.append("ERROR: INDIVIDUAL: US03: {}: Individual has no Birth Date".format(currentIndividual["INDI"]))
+        elif(currentIndividual['DEAT'] != 'NA'):
+            if(currentIndividual['BIRT'] > currentIndividual['DEAT']):
+                error_array.append("ERROR: INDIVIDUAL: US03: {}: Individual has Birth date {} after Death Date {}".format(currentIndividual["INDI"], currentIndividual["BIRT"], currentIndividual["DEAT"]))
+
+
+#USID: 06
+def check_divorce_before_death():
+     for family in family_dic.values():
+            husband_flag=False
+            wife_flag=False
+            if "DIV" in family and family["DIV"]!="NA":
+                divorce_date = family["DIV"]
+                if "husband_object" in family and family["husband_object"] != 'NA':
+                    husband=family["husband_object"]
+                    if "DEAT" in husband and husband["DEAT"] != 'NA':
+                        husband_flag=True
+                        husband_death=husband["DEAT"]
+                if "wife_object" in family and family["wife_object"] != 'NA':
+                    wife=family["wife_object"]
+                    if "DEAT" in wife and wife["DEAT"] != 'NA':
+                        wife_flag=True
+                        wife_death=wife["DEAT"]
+                if husband_flag and wife_flag:
+                    husband_invalid = False
+                    wife_invalid = False
+                    if determine_days(husband_death, divorce_date) > 0:
+                        husband_invalid = True
+                    if determine_days(wife_death, divorce_date) > 0:
+                        wife_invalid = True
+                    if husband_invalid and wife_invalid:
+                        error_array.append("ERROR: FAMILY: US06: {}: {}: Divorce {} happened after the death of both spouses - Husband: {} Wife: {}.".format(family["DIV_LINE"], family["FAM"], family["DIV"], husband_death, wife_death))
+                    elif husband_invalid:
+                        error_array.append("ERROR: FAMILY: US06: {}: {}: Divorce {} happened after the death of husband {}.".format(family["DIV_LINE"], family["FAM"], family["DIV"], husband_death, wife_death))
+                    elif wife_invalid:
+                        error_array.append("ERROR: FAMILY: US06: {}: {}: Divorce {} happened after the death of wife {}.".format(family["DIV_LINE"], family["FAM"], family["DIV"], husband_death, wife_death))
+                        
+
+  
+
 def is_marriage_legal():
     """ US10 Marriage after 14 """
     for family_id in family_dic:
