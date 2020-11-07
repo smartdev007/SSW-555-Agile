@@ -2295,6 +2295,14 @@ def test_list_upcoming_anni_fail():
 
     return sprint3.list_upcoming_anni() == False
 
+def test_unique_indi_and_family():
+    sprint3.error_array = []
+    
+    file = "./test.ged"
+
+    sprint3.read_in(file)
+    return sprint3.error_array==['ERROR: INDIVIDUAL: US22: 51: @I1@: Individuals have the same ID', 'ERROR: FAMILY: US22: 62: @F1@: Two families share the same ID ']
+
 
 
 
@@ -2517,6 +2525,9 @@ class TestUserStory(unittest.TestCase):
         
     def test_divorce_before_death_fail(self):
         self.assertTrue(test_divorce_before_death_fail())
+	
+    def test_unique_indi_and_family(self):
+        self.assertTrue(test_unique_indi_and_family())
 
 if __name__ == '__main__':
     """ Run test cases on startup """
