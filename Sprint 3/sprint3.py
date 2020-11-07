@@ -734,6 +734,47 @@ def list_upcoming_anni():
         printTable("US39: List Upcoming Anniversaries Table", allFields, tagNames, current_dic)
         
     return result
+    
+# US 22: Unique IDs -> All individual IDs should be unique and all family IDs should be unique
+def unique_indi_and_family(value, flag, line_num):
+    if flag=="INDI":
+        if value in ui:
+            error_array.append("ERROR: INDIVIDUAL: US22: {}: {}: Individuals have the same ID".format(line_num, value))
+            return False
+        else:
+            ui.append(value)
+            return True
+    else:       
+        if value in uf:
+            error_array.append("ERROR: FAMILY: US22: {}: {}: Two families share the same ID ".format(line_num, value))
+            return False
+        else:
+            uf.append(value)
+            return True
+
+#US27 - Include Individual Ages in the INDIVIDUALS dictionary
+
+def calculateAge(birthDate): 
+    today = date.today() 
+    age = today.year - birthDate.year - ((today.month, today.day) < (birthDate.month, birthDate.day))
+    return age 
+
+
+def include_individual_ages():
+    for currentIndividual in individuals.values():
+        if(currentIndividual['DEAT'] == 'NA'):
+            newArr = currentIndividual['BIRT'].split('-')
+            age = calculateAge(date(int(newArr[0]), int(newArr[1]), int(newArr[2])))
+            currentIndividual['AGE'] = age
+        else:
+            deathDate = currentIndividual['DEAT'].split('-')
+            birthDate = currentIndividual['BIRT'].split('-')
+            biggerNumber = calculateAge(date(int(birthDate[0]), int(birthDate[1]), int(birthDate[2])))
+            smallerNumber = calculateAge(date(int(deathDate[0]), int(deathDate[1]), int(deathDate[2])))
+            finalAge = biggerNumber - smallerNumber
+            currentIndividual['AGE'] = finalAge
+                          
+                               
 
 def printTable(table_name, fields, tag_names, dictionary):
     """ Print table for US38 and US39 """
