@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import date
 from prettytable import PrettyTable
 import re
 
