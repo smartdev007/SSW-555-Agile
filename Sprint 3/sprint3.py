@@ -637,6 +637,8 @@ def check_sibling_spacing():
                         if 2 < days < (8 * 30):
                             error_array.append(f'ERROR: INDIVIDUAL: US13: {child_object["INDI_LINE"]}: Child {child} is born within 8 months and more than 2 days of sibling')
 
+
+
 def get_individual_siblings(_id, include_husb, include_wife):
     individual = individuals[_id]
     siblings = []
@@ -672,6 +674,55 @@ def get_all_children(individual_object):
                 children.extend(individual_family["FAM_CHILD"])
 
     return children
+
+def check_sibling_marriage():
+
+    #user story 18
+    for individual_id in individuals:
+        individual = individuals[individual_id]
+        if "SPOUSE" in individual and individual["SPOUSE"] != "NA":
+            siblings = get_individual_siblings(individual_id, True, True)
+            for spouse_family_id in individual["SPOUSE"]:
+                spouse_family = family_dic[spouse_family_id]
+                spouse_id = None
+                if "WIFE" in spouse_family and spouse_family["WIFE"] != "NA":
+                    if spouse_family["WIFE"] != individual_id:
+                        spouse_id = spouse_family["WIFE"]
+                if "HUSB" in spouse_family and spouse_family["HUSB"] != "NA":
+                    if spouse_family["HUSB"] != individual_id:
+                        spouse_id = spouse_family["HUSB"]
+                if spouse_id is not None and spouse_id in siblings:
+                    anomaly_array.append("ANOMALY: INDIVIDUAL: US18: {}: {}: Individual married to sibling {}"                                         .format(individual["INDI_LINE"], individual_id, spouse_id))
+
+def check_cousins_marriage():
+    
+    #user story 19
+    for individual_id in individuals:
+        individual = individuals[individual_id]
+        if "SPOUSE" in individual and individual["SPOUSE"] != "NA":
+            if "INDI_CHILD" in individual and individual["INDI_CHILD"] != "NA":
+                cousins = []
+                for child_in_family in individual["INDI_CHILD"]:
+                    family = family_dic[child_in_family]
+                    parent_siblings = []
+                    if "HUSB" in family and family["HUSB"] != "NA":
+                        parent_siblings.extend(get_individual_siblings(family["HUSB"], True, True))
+                    if "WIFE" in family and family["WIFE"] != "NA":
+                        parent_siblings.extend(get_individual_siblings(family["WIFE"], True, True))
+                    for parent_sibling in parent_siblings:
+                        cousins.extend(get_all_children(individuals[parent_sibling]))
+                for spouse_family_id in individual["SPOUSE"]:
+                    spouse_family = family_dic[spouse_family_id]
+                    spouse_id = None
+                    if "WIFE" in spouse_family and spouse_family["WIFE"] != "NA":
+                        if spouse_family["WIFE"] != individual_id:
+                            spouse_id = spouse_family["WIFE"]
+                    if "HUSB" in spouse_family and spouse_family["HUSB"] != "NA":
+                        if spouse_family["HUSB"] != individual_id:
+                            spouse_id = spouse_family["HUSB"]
+                    if spouse_id is not None and spouse_id in cousins:
+                        anomaly_array.append("ANOMALY: INDIVIDUAL: US19: {}: {}: Individual married to cousin {}".format(individual["INDI_LINE"], individual_id, spouse_id))
+
 
 def list_upcoming_bday():
     """ US38: List all living people in a GEDCOM file whose birthdays occur in the next 30 days """

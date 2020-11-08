@@ -2083,6 +2083,66 @@ def test_check_sibling_spacing_siblings_1_day_apart():
     
     return True
 
+def test_check_sibling_marriage_married():
+    family_dic = { '@F1@': {'FAM_CHILD': ['@I1@', '@I2@']}, '@F2@': {'WIFE':'@I1@', 'HUSB': '@I2@'}}
+    individuals = {'@I1@': {'SPOUSE': ['@F2@'], 'INDI_LINE': 1, 'BIRT': '2001-10-1', 'INDI_CHILD': ['@F1@']}, '@I2@': {'SPOUSE': ['@F2@'], 'INDI_LINE': 2, 'BIRT': '2001-10-2', 'INDI_CHILD': ['@F1@']}}
+    result_array = ['ANOMALY: INDIVIDUAL: US18: 1: @I1@: Individual married to sibling @I2@', 'ANOMALY: INDIVIDUAL: US18: 2: @I2@: Individual married to sibling @I1@']
+    
+    sprint3.anomaly_array = []
+    sprint3.family_dic = family_dic
+    sprint3.individuals = individuals
+    
+    sprint3.check_sibling_marriage()
+    
+    assert sprint3.anomaly_array == result_array
+    
+    return True
+
+
+def test_check_sibling_marriage_not_married():
+    family_dic = { '@F1@': {'FAM_CHILD': ['@I1@']}, '@F2@': {'WIFE':'@I1@', 'HUSB': '@I2@'}}
+    individuals = {'@I1@': {'SPOUSE': ['@F2@'], 'INDI_LINE': 1, 'BIRT': '2001-10-1', 'INDI_CHILD': ['@F1@']}, '@I2@': {'SPOUSE': ['@F2@'], 'INDI_LINE': 2, 'BIRT': '2001-10-2'}}
+    result_array = ['ANOMALY: INDIVIDUAL: US18: 1: @I1@: Individual married to sibling @I2@', 'ANOMALY: INDIVIDUAL: US18: 2: @I2@: Individual married to sibling @I1@']
+    
+    sprint3.anomaly_array = []
+    sprint3.family_dic = family_dic
+    sprint3.individuals = individuals
+    
+    sprint3.check_sibling_marriage()
+    
+    assert len(sprint3.anomaly_array) == 0
+    
+    return True
+
+def test_check_cousin_marriage_pass():
+    family_dic = { '@F1@': {'HUSB':'@I3@', 'FAM_CHILD': ['@I1@']}, '@F2@': {'WIFE':'@I1@', 'HUSB': '@I2@'}, '@F3@': {'FAM_CHILD': ['@I3@', '@I4@']}, '@F4@': {'HUSB':'@I4@', 'FAM_CHILD': ['@I2@']}}
+    individuals = {'@I1@': {'SPOUSE': ['@F2@'], 'INDI_LINE': 1, 'BIRT': '2001-10-1', 'INDI_CHILD': ['@F1@']}, '@I2@': {'SPOUSE': ['@F2@'], 'INDI_LINE': 2, 'BIRT': '2001-10-2', 'INDI_CHILD': ['@F4@']}, '@I3@':{'SPOUSE': ['@F1@'], 'INDI_CHILD': ['@F3@']}, '@I4@':{'SPOUSE': ['@F4@'], 'INDI_CHILD': ['@F3@']}}
+    result = ["ANOMALY: INDIVIDUAL: US19: 1: @I1@: Individual married to cousins ['@F2@']", "ANOMALY: INDIVIDUAL: US19: 2: @I2@: Individual married to cousins ['@F2@']"]
+    
+    sprint3.anomaly_array = []
+    sprint3.family_dic = family_dic
+    sprint3.individuals = individuals
+    
+    sprint3.check_cousins_marriage()
+    
+    sprint3.anomaly_array == result
+    
+    return True
+
+
+def test_check_cousin_marriage_fail():
+    family_dic = { '@F1@': {'HUSB':'@I3@', 'FAM_CHILD': ['@I1@']}, '@F2@': {'WIFE':'@I1@', 'HUSB': '@I2@'}, '@F3@': {'FAM_CHILD': ['@I3@']}, '@F4@': {'HUSB':'@I4@', 'FAM_CHILD': ['@I2@']}, '@F5@': {'FAM_CHILD': ['@I4@']}}
+    individuals = {'@I1@': {'SPOUSE': ['@F2@'], 'INDI_LINE': 1, 'BIRT': '2001-10-1', 'INDI_CHILD': ['@F1@']}, '@I2@': {'SPOUSE': ['@F2@'], 'INDI_LINE': 2, 'BIRT': '2001-10-2', 'INDI_CHILD': ['@F4@']}, '@I3@':{'SPOUSE': ['@F1@'], 'INDI_CHILD': ['@F3@']}, '@I4@':{'SPOUSE': ['@F4@'], 'INDI_CHILD': ['@F5@']}}
+    
+    sprint3.anomaly_array = []
+    sprint3.family_dic = family_dic
+    sprint3.individuals = individuals
+    
+    sprint3.check_cousins_marriage()
+    
+    return len(sprint3.anomaly_array) == 0
+
+
 def test_list_upcoming_bday_pass():
     """ Test case for US38 (pass) """
 
@@ -2526,6 +2586,18 @@ class TestUserStory(unittest.TestCase):
     def test_divorce_before_death_fail(self):
         self.assertTrue(test_divorce_before_death_fail())
 	
+    def test_check_sibling_marriage_married(self):
+        self.assertTrue(test_check_sibling_marriage_married())
+    
+    def test_check_sibling_marriage_not_married(self):
+        self.assertTrue(test_check_sibling_marriage_not_married())
+    
+    def test_check_cousin_marriage_pass(self):
+        self.assertTrue(test_check_cousin_marriage_pass())
+    
+    def test_check_cousin_marriage_fail(self):
+        self.assertTrue(test_check_cousin_marriage_fail())
+
     def test_unique_indi_and_family(self):
         self.assertTrue(test_unique_indi_and_family())
 
