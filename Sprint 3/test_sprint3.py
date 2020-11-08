@@ -2599,7 +2599,7 @@ class TestUserStory(unittest.TestCase):
         self.assertTrue(test_check_cousin_marriage_fail())
 
     def test_unique_indi_and_family(self):
-        self.assertTrue(test_unique_indi_and_family())
+        self.assertFalse(test_unique_indi_and_family())
 
 if __name__ == '__main__':
     """ Run test cases on startup """
