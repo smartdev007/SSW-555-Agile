@@ -2421,6 +2421,52 @@ def test_check_multiple_births_4_with_same_birthday():
     
     return True
 
+def test_unique_family_by_spouses_positive_result():
+    """ Test case for US24 (pass) """
+
+    family_dic = {'@F1@': {'FAM': '@F1@', 
+                            'FAM_LINE': 1, 
+                            'husband_object': {'NAME': 'Something'}, 
+                            'wife_object': {'NAME': 'Nothing'}, 
+                            'MARR': '1994-12-12'}, 
+                '@F2@': {'FAM':'@F2@', 
+                        'FAM_LINE': 2, 
+                        'husband_object': {'NAME': 'Something'}, 
+                        'wife_object': {'NAME': 'Nothing'}, 
+                        'MARR': '1994-12-12'}}
+    
+    sprint4.anomaly_array = []
+    sprint4.family_dic = family_dic
+
+    sprint4.unique_family_by_spouses()
+    
+    assert sprint4.anomaly_array[0] == "ANOMALY: FAMILY: US24: 2: @F2@: Family contains same husband, wife and marriage date as another family"
+    
+    return True
+
+def test_unique_family_by_spouses_negative_result():
+    """ Test case for US24 (fail) """
+
+    family_dic = {'@F1@': {'FAM': '@F1@', 
+                            'FAM_LINE': 1, 
+                            'husband_object': {'NAME': 'Something'}, 
+                            'wife_object': {'NAME': 'Nothing'}, 
+                            'MARR': '1994-12-12'}, 
+                '@F2@': {'FAM':'@F2@', 
+                        'FAM_LINE': 2, 
+                        'husband_object': {'NAME': 'Something'}, 
+                        'wife_object': {'NAME': 'Nothing'}, 
+                        'MARR': '1990-12-12'}}
+    
+    sprint4.anomaly_array = []
+    sprint4.family_dic = family_dic
+
+    sprint4.unique_family_by_spouses()
+    
+    assert len(sprint4.anomaly_array) == 0
+    
+    return True
+
 
 class TestUserStory(unittest.TestCase):
     """ Test case for user story """
@@ -2663,6 +2709,14 @@ class TestUserStory(unittest.TestCase):
     def test_check_multiple_births_4_with_same_birthday(self):
         """ Test case for User Story 14 to check if no more than 5 siblings are born at the same time (less than 5) """ 
         self.assertTrue(test_check_multiple_births_4_with_same_birthday())
+
+    def test_unique_family_by_spouses_positive_result(self):
+        """ Test case for User Story 24 to check if no more than one family with the same spouses by name and the same marriage date appears in a GEDCOM file (pass) """
+        self.assertTrue(test_unique_family_by_spouses_positive_result())
+
+    def test_unique_family_by_spouses_negative_result(self):
+        """ Test case for User Story 24 to check if no more than one family with the same spouses by name and the same marriage date appears in a GEDCOM file (fail) """
+        self.assertTrue(test_unique_family_by_spouses_negative_result())
 
 if __name__ == '__main__':
     """ Run test cases on startup """
