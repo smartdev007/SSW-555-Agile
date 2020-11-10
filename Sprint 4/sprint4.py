@@ -846,6 +846,75 @@ def unique_family_by_spouses():
                 anomaly_array.append(f'ANOMALY: FAMILY: US24: {family["FAM_LINE"]}: {family["FAM"]}: Family contains same husband, wife and marriage date as another family')
             else:
                 fams.append(fam)
+
+def listLivingSingle():
+    """ US31: List all living married people in a GEDCOM file """
+
+    current_dic = {}
+    single_count = 0
+    result = True
+
+    for value in individuals.values():
+        if (value["AGE"] != "NA" and int(value["AGE"]) > 30 and value["ALIVE"] == True and value["SPOUSE"] == "NA"):
+            if (value["BIRT"] == "NA"):
+                error_array.append(f'ERROR: INDIVIDUAL: US31: {value["INDI_LINE"]}: Single Person {value["INDI"]} does not have birthday!')
+                result = False
+            else:
+                current_dic[value["INDI"]] = value
+                single_count += 1
+
+    if single_count > 0:
+        allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
+        tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
+
+        printTable("US31: Unmarried people over 30", allFields, tagNames, current_dic)
+
+    return result
+
+def listAllOrphand():
+    """ US33: List all multiple births in a GEDCOM file """
+
+    current_dic = {}
+    orphand_count = 0
+    result = True
+
+    for person in individuals.values():
+        if (person["AGE"] == "NA"):
+            error_array.append("ERROR: INDIVIDUAL: US33: {}: Orphaned child {} does not have age!".format(person["INDI_LINE"], person["INDI"]))
+            result = False
+
+        elif (int(person["AGE"]) < 18 and person["ALIVE"] == True):
+            famID = person["INDI_CHILD"]
+
+            if (isinstance(famID, list) == True):
+                famID = "".join(famID)
+            else:
+                famID = str(famID)
+
+            if (famID != "NA"):
+                if (famID in family_dic.keys()):
+                    currentFamily = family_dic[famID]
+                    
+                    current_husb = str(currentFamily["HUSB"])
+                    current_wife = str(currentFamily["WIFE"])
+                    
+                    if (individuals[current_husb]["ALIVE"] == False and individuals[current_wife]["ALIVE"] == False):
+                        current_dic[person["INDI"]] = person
+                        orphand_count += 1
+                else:
+                    error_array.append(f'ERROR: INDIVIDUAL: US33: {person["INDI_LINE"]}: Orphaned child {person["INDI"]} does not belong to a family!')
+                    result = False  
+            else:
+                error_array.append(f'ERROR: INDIVIDUAL: US33: {person["INDI_LINE"]}: Orphaned child {person["INDI"]} does not have a family ID!')
+                result = False
+
+    if orphand_count > 0:
+        allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
+        tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
+
+        printTable("US33: Orphaned Children", allFields, tagNames, current_dic)
+
+    return result
     
 # US 22: Unique IDs -> All individual IDs should be unique and all family IDs should be unique
 def unique_indi_and_family(value, flag, line_num):
