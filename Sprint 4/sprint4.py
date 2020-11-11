@@ -442,6 +442,17 @@ def is_uncle_aunt_marriage_legal():
                                     return False
     return True
 
+# US 21:
+def correct_gender():
+     for family in family_dic.values():
+        if "husband_object" in family:
+            husband_sex=family["husband_object"]["SEX"]
+            if(husband_sex != "M"):
+                error_array.append("ERROR: FAMILY: US21: {}: {}: Is Husband and has Sex as Female".format(family["husband_object"]["SEX_LINE"], family["husband_object"]["INDI"] ))
+        if "wife_object" in family:
+            wife_sex=family["wife_object"]["SEX"]
+            if(wife_sex != "F"):
+                error_array.append("ERROR: FAMILY: US21: {}: {}: Is Wife and has Sex as Male".format(family["wife_object"]["SEX_LINE"], family["wife_object"]["INDI"] ))
 
 #USID: 25
 # This checks the unique
@@ -558,6 +569,38 @@ def large_age_diff():
                 anomaly_array.append("ANOMALY: FAMILY: US34: {}: Family with unique id: {} has a large spouse age difference".format(value["FAM_LINE"], value["FAM"]))
 
 
+#US 42
+def validate_date():
+    for value in individuals.values():
+        if (value["BIRT"] != "NA"):
+            birth = value["BIRT"]
+            try:
+                datetime.strptime(birth, '%Y-%m-%d')
+            except ValueError:
+                error_array.append("ERROR: INDIVIDUAL: US42: {}: Individual {} does not have valid Birth Date {}".format(value["BIRT_LINE"], value["INDI"], value["BIRT"]))
+            
+        if (value["DEAT"] != "NA"):
+            death = value["DEAT"]
+            try:
+                datetime.strptime(death, '%Y-%m-%d')
+            except ValueError:
+                error_array.append("ERROR: INDIVIDUAL: US42: {}: Individual {} does not have valid Death Date {}".format(value["DEAT_LINE"], value["INDI"], value["DEAT"]))
+                
+    for value in family_dic.values():
+        if (value["MARR"] != "NA"):
+            marr = value["MARR"]
+            try:
+                datetime.strptime(marr, '%Y-%m-%d')
+            except ValueError:
+                error_array.append("ERROR: FAMILY: US42: {}: Famliy {} does not have valid Marriage Date {}".format(value["MARR_LINE"], value["FAM"], value["MARR"]))
+                
+        if (value["DIV"] != "NA"):
+            div = value["DIV"]
+            try:
+                datetime.strptime(div, '%Y-%m-%d')
+            except ValueError:
+                error_array.append("ERROR: FAMILY: US42: {}: Famliy {} does not have valid Divorce Date {}".format(value["DIV_LINE"], value["FAM"], value["DIV"]))
+        
 
 
 # Prints out a table of dictionary data with the passed-in arguments

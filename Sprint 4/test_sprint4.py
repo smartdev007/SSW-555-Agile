@@ -2421,6 +2421,105 @@ def test_check_multiple_births_4_with_same_birthday():
     
     return True
 
+
+
+def test_family_gender_fail():
+    family_dic = {'@F1@': {'FAM': '@F1@',
+      'FAM_LINE': 461,
+      'HUSB_NAME': 'Samuel /Venzon/',
+      'HUSB_LINE': 462,
+      'HUSB': '@I6@',
+      'WIFE_NAME': 'Willodean /Malagon/',
+      'WIFE_LINE': 463,
+      'WIFE': '@I1@',
+      'MARR_LINE': 466,
+      'MARR': '1970-7-7',
+      'DIV': 'NA',
+      'husband_object': {'INDI': '@I6@',
+       'INDI_LINE': 67,
+       'NAME': 'Samuel /Venzon/',
+       'NAME_LINE': 68,
+       'SEX': 'F',
+       'SEX_LINE': 72,
+       'BIRT_LINE': 73,
+       'BIRT': '1958-12-6',
+       'SPOUSE': ['@F1@'],
+       'FAMS_LINE': 75,
+       'DEAT': 'NA',
+       'AGE': 60,
+       'ALIVE': True},
+      'wife_object': {'INDI': '@I1@',
+       'INDI_LINE': 14,
+       'NAME': 'Willodean /Malagon/',
+       'NAME_LINE': 15,
+       'SEX': 'F',
+       'SEX_LINE': 19,
+       'BIRT_LINE': 20,
+       'BIRT': '1974-7-7',
+       'DEAT_LINE': 22,
+       'DEAT': '1970-6-20',
+       'INDI_CHILD': ['@F2@'],
+       'SPOUSE': ['@F1@'],
+       'FAMS_LINE': 24,
+       'FAMC_LINE': 25,
+       'AGE': -4,
+       'ALIVE': False}}}
+    
+    sprint4.error_array=[]
+    sprint4.family_dic = family_dic
+    sprint4.correct_gender()
+    
+    return sprint4.error_array == ["ERROR: FAMILY: US21: 72: @I6@: Is Husband and has Sex as Female"]
+
+
+def test_family_gender_pass():
+    family_dic = {'@F1@': {'FAM': '@F1@',
+      'FAM_LINE': 461,
+      'HUSB_NAME': 'Samuel /Venzon/',
+      'HUSB_LINE': 462,
+      'HUSB': '@I6@',
+      'WIFE_NAME': 'Willodean /Malagon/',
+      'WIFE_LINE': 463,
+      'WIFE': '@I1@',
+      'MARR_LINE': 466,
+      'MARR': '1970-7-7',
+      'DIV': 'NA',
+      'husband_object': {'INDI': '@I6@',
+       'INDI_LINE': 67,
+       'NAME': 'Samuel /Venzon/',
+       'NAME_LINE': 68,
+       'SEX': 'M',
+       'SEX_LINE': 72,
+       'BIRT_LINE': 73,
+       'BIRT': '1958-12-6',
+       'SPOUSE': ['@F1@'],
+       'FAMS_LINE': 75,
+       'DEAT': 'NA',
+       'AGE': 60,
+       'ALIVE': True},
+      'wife_object': {'INDI': '@I1@',
+       'INDI_LINE': 14,
+       'NAME': 'Willodean /Malagon/',
+       'NAME_LINE': 15,
+       'SEX': 'F',
+       'SEX_LINE': 19,
+       'BIRT_LINE': 20,
+       'BIRT': '1974-7-7',
+       'DEAT_LINE': 22,
+       'DEAT': '1970-6-20',
+       'INDI_CHILD': ['@F2@'],
+       'SPOUSE': ['@F1@'],
+       'FAMS_LINE': 24,
+       'FAMC_LINE': 25,
+       'AGE': -4,
+       'ALIVE': False}}}
+    
+    sprint4.error_array=[]
+    sprint4.family_dic = family_dic
+    sprint4.correct_gender()
+    
+    return len(sprint4.error_array) == 0
+
 def test_unique_family_by_spouses_positive_result():
     """ Test case for US24 (pass) """
 
@@ -3539,7 +3638,43 @@ def test_list_orphan_fail():
 
     return True
 
+def test_valid_dates_fail():
+    family_dic = {'@F1@': {'FAM': '@F1@',
+      'FAM_LINE': 461,
+      'HUSB_NAME': 'Samuel /Venzon/',
+      'HUSB_LINE': 462,
+      'HUSB': '@I6@',
+      'WIFE_NAME': 'Willodean /Malagon/',
+      'WIFE_LINE': 463,
+      'WIFE': '@I1@',
+      'MARR_LINE': 466,
+      'MARR': '1970-2-30',
+      'DIV': 'NA'}}
+    
+    sprint4.error_array=[]
+    sprint4.family_dic = family_dic
+    sprint4.validate_date()
+    
+    return sprint4.error_array == ["ERROR: FAMILY: US42: 466: Famliy @F1@ does not have valid Marriage Date 1970-2-30"]
 
+def test_valid_dates_pass():
+    family_dic = {'@F1@': {'FAM': '@F1@',
+      'FAM_LINE': 461,
+      'HUSB_NAME': 'Samuel /Venzon/',
+      'HUSB_LINE': 462,
+      'HUSB': '@I6@',
+      'WIFE_NAME': 'Willodean /Malagon/',
+      'WIFE_LINE': 463,
+      'WIFE': '@I1@',
+      'MARR_LINE': 466,
+      'MARR': '1970-2-2',
+      'DIV': 'NA'}}
+    
+    sprint4.error_array=[]
+    sprint4.family_dic = family_dic
+    sprint4.validate_date()
+    
+    return len(sprint4.error_array) == 0
 
 
 class TestUserStory(unittest.TestCase):
@@ -3807,6 +3942,18 @@ class TestUserStory(unittest.TestCase):
     def test_list_orphan_fail(self):
         """ Test case for User Story 33 to check all ophaned children (both parents dead and child < 18 years old) in a GEDCOM file (pass)"""
         self.assertTrue(test_list_orphan_fail())
+
+    def test_family_gender_fail(self):
+        self.assertTrue(test_family_gender_fail())
+        
+    def test_family_gender_pass(self):
+        self.assertTrue(test_family_gender_pass())
+
+    def test_valid_dates_fail(self):
+        self.assertTrue(test_valid_dates_fail())
+
+    def test_valid_dates_pass(self):
+        self.assertTrue(test_valid_dates_pass())
 
 if __name__ == '__main__':
     """ Run test cases on startup """
