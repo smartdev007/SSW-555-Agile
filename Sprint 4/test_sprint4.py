@@ -3676,6 +3676,52 @@ def test_valid_dates_pass():
     
     return len(sprint4.error_array) == 0
 
+def test_corresponding_entries_invalid_entries():
+    family_dic = {'@F1@': {'FAM_LINE': 1, 'HUSB': '@I1@', 'husband_object': {'SPOUSE': ['@F2@']}}}
+    
+    sprint4.family_dic = family_dic
+    sprint4.error_array = []
+    
+    sprint4.check_corresponding_entries()
+    
+    assert sprint4.error_array[0] == "ERROR: FAMILY: US26: 1: @I1@: Husband id does not match with family id in individuals spouse entry"
+    return True
+
+def test_corresponding_entries_valid_entries():
+    family_dic = {'@F1@': {'FAM_LINE': 1, 'HUSB': '@I1@', 'husband_object': {'SPOUSE': ['@F1@']}}}
+    
+    sprint4.family_dic = family_dic
+    sprint4.error_array = []
+    
+    sprint4.check_corresponding_entries()
+    
+    assert len(sprint4.error_array) == 0
+    return True
+
+
+#US28 List siblings in families by decreasing age, i.e. oldest siblings first
+# Success test
+def test_list_siblings_by_age_success():
+    family_dic = {'@F1@': {'FAM': '@F1@', 'FAM_LINE': 716, 'HUSB_NAME': 'Samuel /Venzon/', 'HUSB_LINE': 717, 'HUSB': '@I6@', 'WIFE_NAME': 'Willodean /Malagon/', 'WIFE_LINE': 718, 'WIFE': '@I1@', 'FAM_CHILD': ['@I7@', '@I13@'], 'CHIL_LINE_@I7@': 719, 'CHIL': '@I13@', 'CHIL_LINE': 720, 'CHIL_LINE_@I13@': 720, 'MARR_LINE': 721, 'MARR': '1970-11-29', 'DIV': 'NA', 'husband_object': {'INDI': '@I6@', 'INDI_LINE': 67, 'NAME': 'Samuel /Venzon/', 'NAME_LINE': 68, 'SEX': 'M', 'SEX_LINE': 72, 'BIRT_LINE': 73, 'BIRT': '1958-12-6', 'INDI_CHILD': 'NA', 'SPOUSE': ['@F1@'], 'FAMS_LINE': 75, 'DEAT': 'NA', 'AGE': 60, 'ALIVE': True}, 'wife_object': {'INDI': '@I1@', 'INDI_LINE': 14, 'NAME': 'Willodean /Malagon/', 'NAME_LINE': 15, 'SEX': 'F', 'SEX_LINE': 19, 'BIRT_LINE': 20, 'BIRT': 'NA', 'DEAT_LINE': 22, 'DEAT': 'NA', 'INDI_CHILD': ['@F2@'], 'SPOUSE': ['@F1@'], 'FAMS_LINE': 24, 'FAMC_LINE': 25, 'AGE': 'NA', 'ALIVE': 'NA'}, 'children_objects': [{'INDI': '@I7@', 'INDI_LINE': 76, 'NAME': 'Byron /Vezon/', 'NAME_LINE': 77, 'SEX': 'M', 'SEX_LINE': 81, 'BIRT_LINE': 82, 'BIRT': '1973-7-6', 'INDI_CHILD': ['@F1@'], 'SPOUSE': ['@F6@'], 'FAMS_LINE': 84, 'FAMC_LINE': 85, 'DEAT': 'NA', 'AGE': 46, 'ALIVE': True}, {'INDI': '@I13@', 'INDI_LINE': 134, 'NAME': 'Beth /Venzon/', 'NAME_LINE': 135, 'SEX': 'F', 'SEX_LINE': 139, 'BIRT_LINE': 140, 'BIRT': '1975-7-8', 'INDI_CHILD': ['@F1@'], 'SPOUSE': ['@F9@'], 'FAMS_LINE': 142, 'FAMC_LINE': 143, 'DEAT': 'NA', 'AGE': 44, 'ALIVE': True}]}}
+    individual_dic = {'@I7@': {'INDI': '@I7@', 'INDI_LINE': 76, 'NAME': 'Byron /Vezon/', 'NAME_LINE': 77, 'SEX': 'M', 'SEX_LINE': 81, 'BIRT_LINE': 82, 'BIRT': '1973-7-6', 'INDI_CHILD': ['@F1@'], 'SPOUSE': ['@F6@'], 'FAMS_LINE': 84, 'FAMC_LINE': 85, 'DEAT': 'NA', 'AGE': 46, 'ALIVE': True}, '@I13@': {'INDI': '@I13@', 'INDI_LINE': 134, 'NAME': 'Beth /Venzon/', 'NAME_LINE': 135, 'SEX': 'F', 'SEX_LINE': 139, 'BIRT_LINE': 140, 'BIRT': '1975-7-8', 'INDI_CHILD': ['@F1@'], 'SPOUSE': ['@F9@'], 'FAMS_LINE': 142, 'FAMC_LINE': 143, 'DEAT': 'NA', 'AGE': 44, 'ALIVE': True}}
+    
+    sprint4.family_dic = family_dic
+    sprint4.individuals = individual_dic
+    result = sprint4.listSiblingsByAge()
+    return result == 0
+
+
+#US28 List siblings in families by decreasing age, i.e. oldest siblings first
+# Failed test
+def test_list_siblings_by_age_fail():
+    family_dic = {'@F1@': {'FAM': '@F1@', 'FAM_LINE': 716, 'HUSB_NAME': 'Samuel /Venzon/', 'HUSB_LINE': 717, 'HUSB': '@I6@', 'WIFE_NAME': 'Willodean /Malagon/', 'WIFE_LINE': 718, 'WIFE': '@I1@', 'FAM_CHILD': ['@I7@', '@I13@'], 'CHIL_LINE_@I7@': 719, 'CHIL': '@I13@', 'CHIL_LINE': 720, 'CHIL_LINE_@I13@': 720, 'MARR_LINE': 721, 'MARR': '1970-11-29', 'DIV': 'NA', 'husband_object': {'INDI': '@I6@', 'INDI_LINE': 67, 'NAME': 'Samuel /Venzon/', 'NAME_LINE': 68, 'SEX': 'M', 'SEX_LINE': 72, 'BIRT_LINE': 73, 'BIRT': '1958-12-6', 'INDI_CHILD': 'NA', 'SPOUSE': ['@F1@'], 'FAMS_LINE': 75, 'DEAT': 'NA', 'AGE': 60, 'ALIVE': True}, 'wife_object': {'INDI': '@I1@', 'INDI_LINE': 14, 'NAME': 'Willodean /Malagon/', 'NAME_LINE': 15, 'SEX': 'F', 'SEX_LINE': 19, 'BIRT_LINE': 20, 'BIRT': 'NA', 'DEAT_LINE': 22, 'DEAT': 'NA', 'INDI_CHILD': ['@F2@'], 'SPOUSE': ['@F1@'], 'FAMS_LINE': 24, 'FAMC_LINE': 25, 'AGE': 'NA', 'ALIVE': 'NA'}, 'children_objects': [{'INDI': '@I7@', 'INDI_LINE': 76, 'NAME': 'Byron /Vezon/', 'NAME_LINE': 77, 'SEX': 'M', 'SEX_LINE': 81, 'BIRT_LINE': 82, 'BIRT': '1973-7-6', 'INDI_CHILD': ['@F1@'], 'SPOUSE': ['@F6@'], 'FAMS_LINE': 84, 'FAMC_LINE': 85, 'DEAT': 'NA', 'AGE': 46, 'ALIVE': True}, {'INDI': '@I13@', 'INDI_LINE': 134, 'NAME': 'Beth /Venzon/', 'NAME_LINE': 135, 'SEX': 'F', 'SEX_LINE': 139, 'BIRT_LINE': 140, 'BIRT': '1975-7-8', 'INDI_CHILD': ['@F1@'], 'SPOUSE': ['@F9@'], 'FAMS_LINE': 142, 'FAMC_LINE': 143, 'DEAT': 'NA', 'AGE': 'NA', 'ALIVE': True}]}}
+    individual_dic = {'@I7@': {'INDI': '@I7@', 'INDI_LINE': 76, 'NAME': 'Byron /Vezon/', 'NAME_LINE': 77, 'SEX': 'M', 'SEX_LINE': 81, 'BIRT_LINE': 82, 'BIRT': '1973-7-6', 'INDI_CHILD': ['@F1@'], 'SPOUSE': ['@F6@'], 'FAMS_LINE': 84, 'FAMC_LINE': 85, 'DEAT': 'NA', 'AGE': "NA", 'ALIVE': True}, '@I13@': {'INDI': '@I13@', 'INDI_LINE': 134, 'NAME': 'Beth /Venzon/', 'NAME_LINE': 135, 'SEX': 'F', 'SEX_LINE': 139, 'BIRT_LINE': 140, 'BIRT': '1975-7-8', 'INDI_CHILD': ['@F1@'], 'SPOUSE': ['@F9@'], 'FAMS_LINE': 142, 'FAMC_LINE': 143, 'DEAT': 'NA', 'AGE': 44, 'ALIVE': True}}
+    
+    sprint4.family_dic = family_dic
+    sprint4.individuals = individual_dic
+    result = sprint4.listSiblingsByAge()
+    return result != 0
+
 
 class TestUserStory(unittest.TestCase):
     """ Test case for user story """
@@ -3954,6 +4000,18 @@ class TestUserStory(unittest.TestCase):
 
     def test_valid_dates_pass(self):
         self.assertTrue(test_valid_dates_pass())
+
+    def test_corresponding_entries_invalid_entries(self):
+        self.assertTrue(test_corresponding_entries_invalid_entries())
+
+    def test_corresponding_entries_valid_entries(self):
+        self.assertTrue(test_corresponding_entries_valid_entries()) 
+
+    def test_list_siblings_by_age_success(self):
+        self.assertTrue(test_list_siblings_by_age_success())
+        
+    def test_list_siblings_by_age_fail(self):
+        self.assertTrue(test_list_siblings_by_age_fail())       
 
 if __name__ == '__main__':
     """ Run test cases on startup """
