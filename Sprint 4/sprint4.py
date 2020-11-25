@@ -998,6 +998,71 @@ def include_individual_ages():
             finalAge = biggerNumber - smallerNumber
             currentIndividual['AGE'] = finalAge
                           
+#USID: 26
+def check_corresponding_entries():
+    for family_id in family_dic:
+        family = family_dic[family_id]
+        if "HUSB" in family and family["HUSB"] != "NA":
+            husband_object = family["husband_object"]
+            if husband_object != "NA" and family_id not in husband_object["SPOUSE"]:
+                error_array.append("ERROR: FAMILY: US26: {}: {}: Husband id does not match with family id in individuals spouse entry".format(family["FAM_LINE"], family["HUSB"]))
+        if "WIFE" in family and family["WIFE"] != "NA":
+            wife_object = family["wife_object"]
+            if wife_object != "NA" and family_id not in wife_object["SPOUSE"]:
+                error_array.append("ERROR: FAMILY: US26: {}: {}: Wife id does not match with family id in individuals spouse entry".format(family["FAM_LINE"], family["WIFE"]))
+        if "children_objects" in family and family["children_objects"] != "NA":
+            for child_object in family["children_objects"]:
+                if child_object != "NA" and family_id not in child_object["INDI_CHILD"]:
+                    error_array.append("ERROR: FAMILY: US26: {}: {}: Child id does not match with family id in individuals spouse entry".format(family["FAM_LINE"], child_object["INDI"]))
+
+#US28 List siblings in families by decreasing age, i.e. oldest siblings first
+def listSiblingsByAge():
+    error_count = 0
+    print("US28: List siblings by decreasing age")
+    file = open("cs555_sprint_outputs.txt", "a")
+    file.write("US28: List siblings by decreasing age" + "\n")
+    file.close()
+    for fam in family_dic.values():
+        currentSiblings = fam["FAM_CHILD"]
+        sibling_count = 1
+        if (currentSiblings != "NA"):
+            current_dic = {}
+            for sibling in currentSiblings:
+                siblingAge = individuals[sibling]["AGE"]
+                if (siblingAge == "NA"): #one of the siblings does not have age
+                    error_array.append(("ERROR: FAMILY: US28: {}: Child {} has no age").format(individuals[sibling]["INDI_LINE"], sibling))
+                    sibling_count = 0
+                    error_count += 1
+                    break;
+                if int(siblingAge) in current_dic:
+                    sibling_list = current_dic[int(siblingAge)]
+                    sibling_list.append(sibling)
+                    current_dic[int(siblingAge)] = sibling_list
+                else:
+                    sibling_list = [sibling]
+                    current_dic[int(siblingAge)] = sibling_list
+            if (sibling_count == 1):
+                temp_dic = sorted(current_dic.keys(), reverse=True)
+                resultList = []
+                print("+-----Family " + str(fam["FAM"]) + "-----+")
+                file = open("cs555_sprint_outputs.txt", "a")
+                file.write("+-----Family " + str(fam["FAM"]) + "-----+" + "\n")
+                for childList in temp_dic:
+                    for child in current_dic[childList]:
+                        resultList.append(str(child))
+                        print("Individual:" + str(child) + ", Age:" + str(childList) + " ")
+                        file.write("Individual:" + str(child) + ", Age:" + str(childList) + " \n")
+#                 print("\n")
+#                 file.write("\n")
+                file.close()
+        else: #no children in the family
+            anomaly_array.append("ANOMALY: FAMILY: US28: {}: Family {} has no children".format(fam["FAM_LINE"], fam["FAM"]))
+            error_count += 1
+    print("\n")
+    file = open("cs555_sprint_outputs.txt", "a")
+    file.write("+-----End of US28-----+\n\n")
+    file.close()
+    return error_count
                                
 
 def printTable(table_name, fields, tag_names, dictionary):
