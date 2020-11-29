@@ -169,17 +169,21 @@ def is_age_legal():
                 else:
                     anomaly_array.append(f"ANOMALY: INDIVIDUAL: US07: {indi_id}: More than 150 years old at death - Birth Date {indi['BIRT']}: Death Date {indi['DEAT']}")
 
-def determine_days(d1, d2):
-    """ Determine difference between days for US08 and US09 """
-    year1 = int(d1.split('-')[0])
-    month1 = int(d1.split('-')[1])
-    day1 = int(d1.split('-')[2])
+def determine_days(date1, date2):
+    year1=int(date1.split('-')[0])
+    month1= int(date1.split('-')[1])
+    day1= int(date1.split('-')[2])
     
-    year2 = int(d2.split('-')[0])
-    month2 = int(d2.split('-')[1])
-    day2 = int(d2.split('-')[2])
+    if date2 == None:
+        year2 = int(datetime.today().strftime("%Y"))
+        month2 = int(datetime.today().strftime("%m"))
+        day2 = int(datetime.today().strftime("%d"))
+    else:
+        year2=int(date2.split('-')[0])
+        month2= int(date2.split('-')[1])
+        day2= int(date2.split('-')[2])
     
-    return (year2 - year1) * 365 + (month2 - month1) * 30 + day2- day1
+    return (year2 - year1) * 365 + (month2 - month1)* 30 + day2- day1
 
 def birth_before_marriage():
     """ US08: Birth before marriage of parents """
@@ -1063,7 +1067,30 @@ def listSiblingsByAge():
     file.write("+-----End of US28-----+\n\n")
     file.close()
     return error_count
-                               
+
+#US 35 List recent births
+def list_recent_births():
+    current_dic = {}
+    bday_count = 0
+    result = True
+    
+    for value in individuals.values():
+        if (value["BIRT"] == 'NA'):
+            error_array.append("ERROR: INDIVIDUAL: US35: {}: Person {} does not have birthday!".format(value["BIRT_LINE"], value["BIRT"]))
+            result = False
+        else:
+            day_difference = determine_days(value["BIRT"], None)
+            if (day_difference > 0 and day_difference <= 30):
+                current_dic[value["INDI"]] = value
+                bday_count += 1
+
+    if bday_count > 0:
+        #Use pretty table module to print out the results
+        allFields = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Spouse"]
+        tagNames = ["INDI", "NAME", "SEX", "BIRT", "AGE", "ALIVE", "DEAT", "SPOUSE"]
+        printTable("US35 List Recent Births Table", allFields, tagNames, current_dic)   
+    return result
+        
 
 def printTable(table_name, fields, tag_names, dictionary):
     """ Print table for US38 and US39 """

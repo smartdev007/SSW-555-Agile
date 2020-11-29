@@ -2,6 +2,8 @@ import unittest
 import sprint4
 import mock
 from prettytable import PrettyTable
+from datetime import datetime
+from datetime import timedelta
 
 def test_legal_marriage(age):
     family_dic = {
@@ -3722,6 +3724,40 @@ def test_list_siblings_by_age_fail():
     result = sprint4.listSiblingsByAge()
     return result != 0
 
+# US35
+def test_list_recent_births_pass():
+    
+    #Mock individuals dictionary
+    individuals = {'@I1@': {'INDI': '@I1@', 'INDI_LINE': 14, 'NAME': 'David /Chang/', 'NAME_LINE': 15, 'SEX': 'M', 'SEX_LINE': 19, 'BIRT': '1990-11-9', 'INDI_CHILD': ['@F1@'], 'SPOUSE': 'NA', 'FAMC_LINE': 22, 'DEAT': 'NA', 'BIRT_LINE': 22, 'AGE': '0', 'ALIVE': True}}
+    
+    #Creates a new date that's within 30 days from today's date
+    current_date = datetime.today() + timedelta(days=10)
+    individuals["@I1@"]["BIRT"] = current_date.strftime("%Y-%m-%d")
+    
+    sprint4.individuals = individuals
+
+    return sprint4.list_recent_births() == True
+
+
+
+def test_list_recent_births_fail():
+    
+    #Mock individuals dictionary
+    individuals = {'@I1@': {'INDI': '@I1@', 'INDI_LINE': 14, 'NAME': 'David /Chang/', 'NAME_LINE': 15, 'SEX': 'M', 'SEX_LINE': 19, 'BIRT': 'NA', 'INDI_CHILD': ['@F1@'], 'SPOUSE': 'NA', 'FAMC_LINE': 22, 'DEAT': 'NA', 'BIRT_LINE': 22, 'AGE': '0', 'ALIVE': True}}
+    
+    sprint4.individuals = individuals
+
+    return sprint4.list_recent_births() == False
+
+def test_include_partial_dates():
+    sprint4.error_array = []
+    sprint4.individuals = None
+    sprint4.family_dic = None
+    sprint4.document = sprint4.read_in("./test.ged")
+    sprint4.create_individuals_map()
+    sprint4.create_family_dic()
+    return sprint4.individuals['@I1@']["BIRT"]=="1587-1-1" and sprint4.individuals['@I3@']["BIRT"]=="1900-9-1" and sprint4.family_dic['@F1@']["MARR"]=="1600-1-1" and sprint4.error_array==['ERROR: INDIVIDUAL: US41: 21: @I1@: Invalid month format!'] 
+
 
 class TestUserStory(unittest.TestCase):
     """ Test case for user story """
@@ -4012,6 +4048,15 @@ class TestUserStory(unittest.TestCase):
         
     def test_list_siblings_by_age_fail(self):
         self.assertTrue(test_list_siblings_by_age_fail())       
+
+    def test_list_recent_births_pass(self):
+        self.assertTrue(test_list_recent_births_pass())
+
+    def test_list_recent_births_fail(self):
+        self.assertTrue(test_list_recent_births_fail())
+
+    def test_include_partial_dates(self):
+        self.assertFalse(test_include_partial_dates())
 
 if __name__ == '__main__':
     """ Run test cases on startup """
